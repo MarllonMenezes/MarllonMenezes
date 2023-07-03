@@ -18,6 +18,8 @@
 #### Frameworks e Ferramentas:
 
 - ![Cypress](https://img.shields.io/badge/-Cypress-%2317202C?style=for-the-badge&logo=cypress&logoColor=white)
+- ![Playwright](https://img.shields.io/badge/-Playwright-%2300ADEF?style=for-the-badge&logo=playwright&logoColor=white)
+- ![Postman](https://img.shields.io/badge/-Postman-%23FF6C37?style=for-the-badge&logo=postman&logoColor=white)
 
 #### Contatos:
 
