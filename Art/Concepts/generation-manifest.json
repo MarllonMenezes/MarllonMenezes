@@ -1,0 +1,47 @@
+{
+  "project": "Alba World",
+  "studio": "Alba World Games",
+  "visualDirection": "Alba Chibi Pop",
+  "images": [
+    {
+      "file": "character-girl-turnaround.png",
+      "tool": "OpenAI built-in image generation",
+      "role": "concept reference only",
+      "approved": true,
+      "constraints": ["original design", "2.7 heads tall", "smooth rounded anatomy", "no third-party assets"],
+      "prompt": "Use case: stylized-concept\nAsset type: original 3D game character turnaround reference\nPrimary request: design the original Alba World girl base character, child-safe and joyful, shown front, three-quarter, side, and back\nSubject: super-chibi child character, exactly 2.7 heads tall, large expressive oval eyes, small nose, rounded cheeks, slightly oversized hands and shoes, smooth recognizable human anatomy\nStyle/medium: polished stylized 3D animation concept, rounded premium toy realism, smooth organic forms, production reference sheet\nColor palette: lavender, rose, mint, cream, warm skin tones\nMaterials/textures: soft skin, visible cloth seams and gentle folds, smooth hair clumps, no blocky geometry\nConstraints: neutral A-pose; consistent proportions in every view; plain light background; no text; no watermark; fully original design\nAvoid: cubes, voxel art, photoreal adult anatomy, copied PK XD silhouettes, logos, weapons, makeup, high heels"
+    },
+    {
+      "file": "character-boy-turnaround.png",
+      "tool": "OpenAI built-in image generation",
+      "role": "concept reference only",
+      "approved": true,
+      "constraints": ["original design", "2.7 heads tall", "smooth rounded anatomy", "no third-party assets"],
+      "prompt": "Input images: Image 1 is the girl turnaround style and shared-proportion reference; do not copy facial identity or outfit.\nUse case: stylized-concept\nAsset type: original 3D game character turnaround reference\nPrimary request: design the original Alba World boy base character using the exact same height, 2.7-head proportion, hand size, shoe size, eye language, and joint placement as the approved girl\nSubject: child-safe super-chibi boy shown front, three-quarter, side, and back in a neutral A-pose\nStyle/medium: polished stylized 3D animation concept, rounded premium toy realism, smooth recognizable human anatomy\nColor palette: mint, sunny yellow, blue, cream, warm skin tones\nMaterials/textures: visible cloth construction, smooth hair clumps, soft skin, no blocky geometry\nConstraints: shared skeleton compatibility; plain light background; no text; no watermark; fully original design\nAvoid: cubes, voxel art, photoreal adult anatomy, copied game characters, logos, weapons"
+    },
+    {
+      "file": "pets-turnaround.png",
+      "tool": "OpenAI built-in image generation",
+      "role": "concept reference only",
+      "approved": true,
+      "constraints": ["original design", "recognizable pet anatomy", "smooth rounded forms", "no third-party assets"],
+      "prompt": "Use case: stylized-concept\nAsset type: original 3D game pet turnaround and accessory fit reference\nPrimary request: recognizable kitten and puppy, front/side/back, large heads, short legs, clear muzzles, paws, ears, tails and painted fur patterns; include bow, cap and bandana fit guides.\nStyle/medium: Alba Chibi Pop, rounded premium toy realism, smooth recognizable forms, original design\nComposition/framing: clean production concept board with both animals shown in consistent front, side, and back orthographic-style views; accessory fit guides isolated beside them\nMaterials/textures: smooth fur forms with clearly painted fur patterns, soft fabric accessories, no blocky geometry\nConstraints: plain light background; child-safe; anatomically recognizable kitten and puppy; no text; no watermark; fully original design\nAvoid: cubes, voxel art, block-shaped animals, generic placeholder forms, copied game pets, logos, weapons"
+    },
+    {
+      "file": "clothing-and-accessories-board.png",
+      "tool": "OpenAI built-in image generation",
+      "role": "concept reference only",
+      "approved": true,
+      "constraints": ["original design", "2.7-head chibi compatibility", "smooth rounded forms", "no third-party assets"],
+      "prompt": "Use case: stylized-concept\nAsset type: original 3D game modular wardrobe production reference\nPrimary request: four complete child-safe outfits, four hairstyles, two pairs of shoes and four oversized accessories; show construction seams, collars, sleeves, pockets and soft fabric folds; every item isolated and compatible with 2.7-head chibi bodies.\nStyle/medium: Alba Chibi Pop, rounded premium toy realism, smooth recognizable forms, original design\nComposition/framing: clean organized production concept board; exactly four complete outfits, exactly four hairstyles, exactly two pairs of shoes, and exactly four oversized accessories, each item fully visible and isolated with clear spacing\nColor palette: lavender, rose, mint, sunny yellow, blue, cream\nMaterials/textures: soft woven and knit fabric, visible seams and gentle folds, smooth hair clumps, rounded polished accessory materials, no blocky geometry\nConstraints: child-safe modular designs; plain light background; compatible with 2.7-head super-chibi bodies; no mannequins; no text; no watermark; fully original design\nAvoid: cubes, voxel art, square placeholders, copied game outfits, logos, weapons, makeup, high heels, photoreal adult fashion"
+    },
+    {
+      "file": "rooms-and-furniture-board.png",
+      "tool": "OpenAI built-in image generation",
+      "role": "concept reference only",
+      "approved": true,
+      "constraints": ["original design", "recognizable functional furniture", "smooth rounded forms", "no third-party assets"],
+      "prompt": "Use case: stylized-concept\nAsset type: original 3D game rooms, furniture, and decor production reference\nPrimary request: sunny bedroom and garden living room plus sixteen recognizable rounded furniture/decor objects; show bed, sofa, table, chair, shelf, lamp, rug, cushion, books, picture, clock, plant and small surface decor with wood, fabric and ceramic materials.\nStyle/medium: Alba Chibi Pop, rounded premium toy realism, smooth recognizable forms, original design\nComposition/framing: clean production concept board with two complete readable room vignettes across the top and a clearly separated catalog of sixteen individual furniture and decor objects below; every object fully visible\nColor palette: sunny bedroom in rose, lavender, cream, and light wood; garden living room in mint, light blue, leafy green, and soft wood\nMaterials/textures: recognizable rounded wood construction, upholstered fabric with seams and cushions, woven rug, glazed ceramic, leafy plant materials, no blocky geometry\nConstraints: exactly two rooms and sixteen recognizable catalog objects; child-safe functional proportions; plain light board background; no text; no watermark; fully original design\nAvoid: cubes, voxel art, generic box placeholders, copied game rooms or furniture, logos, weapons, photorealism"
+    }
+  ]
+}
