@@ -12,7 +12,7 @@ MVP 2D infantil offline da Alba World Games.
 
 ## Simular celular no PC
 
-O projeto inclui o pacote de dispositivos do Device Simulator. No Unity, abra `Window > General > Device Simulator`, escolha um aparelho e pressione Play. O mouse simula toque e arraste; para proporções manuais, use a janela Game em 16:9 ou 20:9.
+No Unity 6.3, use a janela **Game**: selecione `16:9` ou `20:9`, ajuste a escala para caber na tela e pressione Play. O mouse simula toque e arraste. O pacote Device Simulator oficial disponível para versões anteriores não é compatível com este editor e não faz parte do projeto.
 
 ## Controles do protótipo
 
