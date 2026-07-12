@@ -9,6 +9,7 @@
 /MemoryCaptures/
 /Recordings/
 *.csproj
+!Tools/CoreTests/AlbaWorld.CoreTests.csproj
 *.sln
 *.userprefs
 *.pidb
