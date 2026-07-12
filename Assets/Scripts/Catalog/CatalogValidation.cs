@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using UnityEngine;
 
 namespace AlbaWorld.Catalog;
@@ -72,15 +73,25 @@ public static class CatalogValidation
             return false;
 
         // The round-trip string preserves the decimal value users can enter in the
-        // Inspector. Decimal remainder then avoids float quotient error that scales
-        // with the number of turns and accepted near-divisors at either extreme.
+        // Inspector. Testing the decimal's unscaled integer avoids both float quotient
+        // error and Decimal.Remainder overflow for extremely small exact divisors.
         var inspectorValue = step.ToString("R", CultureInfo.InvariantCulture);
-        return decimal.TryParse(
-                   inspectorValue,
-                   NumberStyles.Float,
-                   CultureInfo.InvariantCulture,
-                   out var decimalStep) &&
-               decimalStep > 0m &&
-               360m % decimalStep == 0m;
+        if (!decimal.TryParse(
+                inspectorValue,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var decimalStep) ||
+            decimalStep <= 0m)
+        {
+            return false;
+        }
+
+        var bits = decimal.GetBits(decimalStep);
+        var unscaled = new BigInteger((uint)bits[0]) |
+                       new BigInteger((uint)bits[1]) << 32 |
+                       new BigInteger((uint)bits[2]) << 64;
+        var scale = (bits[3] >> 16) & 0x7f;
+        var fullRotationAtScale = new BigInteger(360) * BigInteger.Pow(10, scale);
+        return fullRotationAtScale % unscaled == BigInteger.Zero;
     }
 }

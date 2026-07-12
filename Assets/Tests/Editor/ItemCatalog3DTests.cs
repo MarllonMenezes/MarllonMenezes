@@ -60,6 +60,8 @@ public sealed class ItemCatalog3DTests
     [TestCase(360.01f)]
     [TestCase(45.0001f)]
     [TestCase(0.000011f)]
+    [TestCase(float.Epsilon)]
+    [TestCase(float.MaxValue)]
     public void ValidationRejectsNearAndVerySmallNonDivisorRotationSteps(float rotationStep)
     {
         var visual = ItemVisual3D.TestOnly("decor.rotation");
@@ -81,6 +83,8 @@ public sealed class ItemCatalog3DTests
     [TestCase(1f)]
     [TestCase(0.5f)]
     [TestCase(0.1f)]
+    [TestCase(1e-27f)]
+    [TestCase(1e-28f)]
     public void ValidationAcceptsInspectorRepresentableRotationDivisors(float rotationStep)
     {
         var visual = ItemVisual3D.TestOnly("decor.rotation");
