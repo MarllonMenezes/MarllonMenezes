@@ -43,6 +43,10 @@ Os testes Unity ficam em `Assets/Tests/Editor`. O teste automatizado usado nesta
 
 No Unity, use `Alba World > Build Android AAB`. O arquivo é criado em `Builds/AlbaWorld.aab`. A validação local gera um AAB assinado com o certificado Android Debug; configure sua própria keystore/Play App Signing antes do envio à Play Store.
 
+## APK para teste local
+
+No Unity, use `Alba World > Build Android APK (local test)`. O arquivo instalável será criado em `Builds/AlbaWorld.apk` com assinatura de desenvolvimento.
+
 ## Instalação usada nesta máquina
 
 - Unity Hub: `D:\UnityHub\Unity Hub.exe`
