@@ -10,6 +10,10 @@ MVP 2D infantil offline da Alba World Games.
 4. Se a cena não for criada automaticamente, use `Alba World > Generate Demo Scene`.
 5. Pressione Play.
 
+## Simular celular no PC
+
+O projeto inclui o pacote de dispositivos do Device Simulator. No Unity, abra `Window > General > Device Simulator`, escolha um aparelho e pressione Play. O mouse simula toque e arraste; para proporções manuais, use a janela Game em 16:9 ou 20:9.
+
 ## Controles do protótipo
 
 - Menu: personagem, pet, casa, modo foto e idioma.
