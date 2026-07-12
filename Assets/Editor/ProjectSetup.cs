@@ -47,7 +47,7 @@ public static class ProjectSetup
         PlayerSettings.productName = "Alba World";
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, "com.albaworldgames.albaworld");
         PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Standalone, "com.albaworldgames.albaworld");
-        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel23;
+        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel25;
         PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel35;
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
         PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
