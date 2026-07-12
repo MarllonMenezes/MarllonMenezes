@@ -43,7 +43,7 @@ public static class UiFactory
         go.transform.SetParent(parent, false);
         var label = go.GetComponent<Text>();
         label.text = text;
-        label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         label.fontSize = size;
         label.color = color;
         label.alignment = alignment;
