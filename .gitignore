@@ -22,5 +22,6 @@
 .idea/
 work/
 .utmp/
+.superpowers/
 Tools/**/bin/
 Tools/**/obj/
