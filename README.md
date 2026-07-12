@@ -47,6 +47,12 @@ No Unity, use `Alba World > Build Android AAB`. O arquivo é criado em `Builds/A
 
 No Unity, use `Alba World > Build Android APK (local test)`. O arquivo instalável será criado em `Builds/AlbaWorld.apk` com assinatura de desenvolvimento.
 
+Com um aparelho conectado e a depuração USB autorizada:
+
+```powershell
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\platform-tools\adb.exe' install -r Builds\AlbaWorld.apk
+```
+
 ## Instalação usada nesta máquina
 
 - Unity Hub: `D:\UnityHub\Unity Hub.exe`
