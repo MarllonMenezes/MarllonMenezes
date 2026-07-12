@@ -53,12 +53,19 @@ public static class UrpProjectSetup
     private static void EnsureRenderer(UniversalRenderPipelineAsset pipeline, UniversalRendererData renderer)
     {
         var rendererDataList = pipeline.rendererDataList;
-        if (rendererDataList.Length == 1 && rendererDataList[0] == renderer)
+        var serializedPipeline = new SerializedObject(pipeline);
+        var serializedRenderers = serializedPipeline.FindProperty("m_RendererDataList");
+        var serializedDefaultRendererIndex = serializedPipeline.FindProperty("m_DefaultRendererIndex");
+        if (rendererDataList.Length > 0 &&
+            rendererDataList[0] == renderer &&
+            serializedDefaultRendererIndex.intValue == 0)
             return;
 
-        var configuredPipeline = UniversalRenderPipelineAsset.Create(renderer);
-        EditorUtility.CopySerialized(configuredPipeline, pipeline);
-        Object.DestroyImmediate(configuredPipeline);
+        if (serializedRenderers.arraySize == 0)
+            serializedRenderers.arraySize = 1;
+        serializedRenderers.GetArrayElementAtIndex(0).objectReferenceValue = renderer;
+        serializedDefaultRendererIndex.intValue = 0;
+        serializedPipeline.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static void EnsureFolder(string path)
