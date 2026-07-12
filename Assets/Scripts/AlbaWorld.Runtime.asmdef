@@ -1,0 +1,14 @@
+{
+  "name": "AlbaWorld.Runtime",
+  "rootNamespace": "AlbaWorld",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,7 +1,9 @@
 {
   "name": "AlbaWorld.Tests",
   "rootNamespace": "AlbaWorld.Tests",
-  "references": [],
+  "references": [
+    "AlbaWorld.Runtime"
+  ],
   "includePlatforms": [
     "Editor"
   ],

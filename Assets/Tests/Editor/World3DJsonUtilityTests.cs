@@ -93,7 +93,8 @@ public sealed class World3DJsonUtilityTests
 
     private static Type RequiredCoreType(string typeName)
     {
-        var type = Type.GetType($"AlbaWorld.Core.{typeName}, Assembly-CSharp");
+        var type = Type.GetType($"AlbaWorld.Core.{typeName}, AlbaWorld.Runtime") ??
+                   Type.GetType($"AlbaWorld.Core.{typeName}, Assembly-CSharp");
         Assert.That(type, Is.Not.Null, $"Core type AlbaWorld.Core.{typeName} must exist.");
         return type;
     }

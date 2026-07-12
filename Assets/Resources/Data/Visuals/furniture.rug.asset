@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c283ad3d75b150d4abbf3fbab2b97169, type: 3}
+  m_Name: furniture.rug
+  m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
+  definition: {fileID: 11400000, guid: fe9bebbef2e14424a89c77f6b78e3afd, type: 2}
+  prefab: {fileID: 0}
+  girlPrefabOverride: {fileID: 0}
+  boyPrefabOverride: {fileID: 0}
+  equipmentSlot: 0
+  compatibleBodies: 3
+  placement:
+    kind: 1
+    minimumScale: 0.8
+    maximumScale: 1.2
+    rotationStep: 45
+    canHostSmallObjects: 0

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AlbaWorld.Game;
@@ -7,7 +8,7 @@ namespace AlbaWorld.Runtime;
 
 public sealed class RuntimeCatalog : IItemCatalog
 {
-    private readonly Dictionary<string, ItemDefinition> _items = new();
+    private readonly Dictionary<string, ItemDefinition> _items = new(StringComparer.Ordinal);
 
     public RuntimeCatalog()
     {
@@ -66,7 +67,7 @@ public sealed class RuntimeCatalog : IItemCatalog
         item.free = free;
         item.tint = tint;
         item.layer = layer;
-        _items[id] = item;
+        _items.Add(id, item);
     }
 
     public ItemDefinition? Get(string id) => _items.TryGetValue(id, out var item) ? item : null;

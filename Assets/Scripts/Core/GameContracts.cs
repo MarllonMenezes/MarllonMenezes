@@ -7,27 +7,18 @@ namespace AlbaWorld.Game;
 
 public enum ItemCategory
 {
-    Skin,
-    Hair,
-    Outfit,
-    Shoes,
-    HumanAccessory,
-    Pet,
-    PetAccessory,
-    Furniture,
-    Decor
-}
-
-[CreateAssetMenu(menuName = "Alba World/Item Definition", fileName = "ItemDefinition")]
-public sealed class ItemDefinition : ScriptableObject
-{
-    public string itemId = "item.new";
-    public ItemCategory category;
-    public string displayKey = "item.new";
-    public bool free = true;
-    public Color tint = Color.white;
-    [Range(0.4f, 2f)] public float scale = 1f;
-    public int layer = 0;
+    Skin = 0,
+    Hair = 1,
+    Outfit = 2,
+    Shoes = 3,
+    HumanAccessory = 4,
+    Pet = 5,
+    PetAccessory = 6,
+    Furniture = 7,
+    Decor = 8,
+    Body = 9,
+    Face = 10,
+    PetColor = 11
 }
 
 [CreateAssetMenu(menuName = "Alba World/Item Catalog", fileName = "ItemCatalog")]
