@@ -27,12 +27,15 @@ public static class UrpProjectSetup
         if (pipeline == null)
         {
             pipeline = UniversalRenderPipelineAsset.Create(renderer);
-            pipeline.name = "AlbaWorldURP";
-            pipeline.shadowDistance = 20f;
-            pipeline.supportsHDR = false;
-            pipeline.msaaSampleCount = 2;
             AssetDatabase.CreateAsset(pipeline, PipelinePath);
         }
+
+        EnsureRenderer(pipeline, renderer);
+        pipeline.name = "AlbaWorldURP";
+        pipeline.shadowDistance = 20f;
+        pipeline.supportsHDR = false;
+        pipeline.msaaSampleCount = 2;
+        EditorUtility.SetDirty(pipeline);
 
         GraphicsSettings.defaultRenderPipeline = pipeline;
         QualitySettings.renderPipeline = pipeline;
@@ -45,6 +48,17 @@ public static class UrpProjectSetup
         }
 
         AssetDatabase.SaveAssets();
+    }
+
+    private static void EnsureRenderer(UniversalRenderPipelineAsset pipeline, UniversalRendererData renderer)
+    {
+        var rendererDataList = pipeline.rendererDataList;
+        if (rendererDataList.Length == 1 && rendererDataList[0] == renderer)
+            return;
+
+        var configuredPipeline = UniversalRenderPipelineAsset.Create(renderer);
+        EditorUtility.CopySerialized(configuredPipeline, pipeline);
+        Object.DestroyImmediate(configuredPipeline);
     }
 
     private static void EnsureFolder(string path)

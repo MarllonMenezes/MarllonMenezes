@@ -12,12 +12,20 @@ public static class ProjectSetup
 {
     private const string ScenePath = "Assets/Scenes/Main.unity";
 
-    static ProjectSetup() => EditorApplication.delayCall += EnsureDemoScene;
+    static ProjectSetup() => EditorApplication.delayCall += EnsureProjectConfiguration;
+
+    public static void EnsureProjectConfiguration()
+    {
+        UrpProjectSetup.Configure();
+        EnsureMainSceneInBuildSettings();
+        ConfigurePlayer();
+        AssetDatabase.SaveAssets();
+    }
 
     [MenuItem("Alba World/Generate Demo Scene")]
     public static void EnsureDemoScene()
     {
-        UrpProjectSetup.Configure();
+        EnsureProjectConfiguration();
 
         Scene scene;
         if (System.IO.File.Exists(ScenePath))
@@ -39,10 +47,31 @@ public static class ProjectSetup
         EnsureRootObject(scene, "WorldRoot");
 
         EditorSceneManager.SaveScene(scene, ScenePath);
-        EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
-        ConfigurePlayer();
         AssetDatabase.SaveAssets();
         Debug.Log("Alba World demo scene generated.");
+    }
+
+    private static void EnsureMainSceneInBuildSettings()
+    {
+        var scenes = EditorBuildSettings.scenes;
+        for (var index = 0; index < scenes.Length; index++)
+        {
+            if (scenes[index].path != ScenePath)
+                continue;
+
+            if (!scenes[index].enabled)
+            {
+                scenes[index].enabled = true;
+                EditorBuildSettings.scenes = scenes;
+            }
+
+            return;
+        }
+
+        var updatedScenes = new EditorBuildSettingsScene[scenes.Length + 1];
+        System.Array.Copy(scenes, updatedScenes, scenes.Length);
+        updatedScenes[updatedScenes.Length - 1] = new EditorBuildSettingsScene(ScenePath, true);
+        EditorBuildSettings.scenes = updatedScenes;
     }
 
     private static void ConfigureCamera(Scene scene)
