@@ -23,5 +23,6 @@
 work/
 .utmp/
 .superpowers/
+.worktrees/
 Tools/**/bin/
 Tools/**/obj/
