@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 namespace AlbaWorld.Catalog;
 
 public static class CatalogValidation
 {
-    private const float RotationTolerance = 0.0001f;
-
     public static IReadOnlyList<string> Validate(ItemCatalog3D catalog, bool requirePrefabs)
     {
         var errors = new List<string>();
@@ -72,7 +71,16 @@ public static class CatalogValidation
         if (!IsFinite(step) || step <= 0f)
             return false;
 
-        var turns = 360f / step;
-        return Mathf.Abs(turns - Mathf.Round(turns)) <= RotationTolerance;
+        // The round-trip string preserves the decimal value users can enter in the
+        // Inspector. Decimal remainder then avoids float quotient error that scales
+        // with the number of turns and accepted near-divisors at either extreme.
+        var inspectorValue = step.ToString("R", CultureInfo.InvariantCulture);
+        return decimal.TryParse(
+                   inspectorValue,
+                   NumberStyles.Float,
+                   CultureInfo.InvariantCulture,
+                   out var decimalStep) &&
+               decimalStep > 0m &&
+               360m % decimalStep == 0m;
     }
 }
