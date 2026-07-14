@@ -61,6 +61,20 @@ def create_character_mesh(name: str, collection_name: str, rig: bpy.types.Object
     modifier.object = rig
     group = mesh.vertex_groups.new(name="Root")
     group.add(range(len(mesh.data.vertices)), 1.0, "REPLACE")
+    side_groups = {
+        "L": ["UpperArm.L", "LowerArm.L", "Hand.L", "UpperLeg.L", "LowerLeg.L", "Foot.L"],
+        "R": ["UpperArm.R", "LowerArm.R", "Hand.R", "UpperLeg.R", "LowerLeg.R", "Foot.R"],
+    }
+    for suffix, names in side_groups.items():
+        candidates = [
+            vertex.index for vertex in mesh.data.vertices
+            if (vertex.co.x > 0.04 if suffix == "L" else vertex.co.x < -0.04)
+        ]
+        for index, bone_name in enumerate(names):
+            weighted = mesh.vertex_groups.new(name=bone_name)
+            weighted.add([candidates[index % len(candidates)]], 0.5, "REPLACE")
+    hips = mesh.vertex_groups.new(name="Hips")
+    hips.add([min(mesh.data.vertices, key=lambda vertex: abs(vertex.co.x)).index], 0.5, "REPLACE")
     for polygon in mesh.data.polygons:
         polygon.use_smooth = True
     return mesh
@@ -123,6 +137,43 @@ def test_rejects_excessive_mesh_fragmentation() -> None:
         collection.objects.link(fragment)
 
     assert_contains(validator.validate_character(), "excessive mesh fragmentation")
+
+
+def test_rejects_right_bone_weight_on_left_side_vertex() -> None:
+    _, girl, _ = create_valid_scene()
+    left_vertex = max(girl.data.vertices, key=lambda vertex: vertex.co.x)
+    crossed = girl.vertex_groups["UpperArm.R"]
+    crossed.add([left_vertex.index], 0.75, "REPLACE")
+
+    assert_contains(validator.validate_character(), "cross-side weight")
+
+
+def test_rejects_side_bone_weight_on_centerline_vertex() -> None:
+    _, girl, _ = create_valid_scene()
+    center_vertex = min(girl.data.vertices, key=lambda vertex: abs(vertex.co.x))
+    crossed = girl.vertex_groups["UpperArm.L"]
+    crossed.add([center_vertex.index], 0.75, "REPLACE")
+
+    assert_contains(validator.validate_character(), "centerline side weight")
+
+
+def test_rejects_explosive_evaluated_mesh_during_walk_and_photo_poses() -> None:
+    _, girl, _ = create_valid_scene()
+    explosive = girl.modifiers.new("ExplosivePoseDeform", "DISPLACE")
+    explosive.direction = "X"
+    explosive.mid_level = 0.0
+    explosive.strength = 10.0
+
+    errors = validator.validate_character()
+    assert_contains(errors, "deformation pose walk")
+    assert_contains(errors, "deformation pose photo")
+
+
+def test_requires_all_walk_and_photo_joint_weight_groups_per_character() -> None:
+    _, girl, _ = create_valid_scene()
+    girl.vertex_groups.remove(girl.vertex_groups["Hand.L"])
+
+    assert_contains(validator.validate_character(), "BodyGirl missing deformation weight groups: Hand.L")
 
 
 def main() -> None:

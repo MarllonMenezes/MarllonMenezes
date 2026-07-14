@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -137,9 +138,57 @@ public sealed class CharacterImportTests
         Assert.That(setupType, Is.Not.Null);
         setupType!.GetMethod("Build")!.Invoke(null, null);
 
-        Assert.That(materialPaths, Has.Length.EqualTo(11));
-        foreach (var path in materialPaths)
+        var rebuiltMaterialPaths = AssetDatabase.FindAssets("t:Material", new[] { "Assets/Art3D/Characters/Materials" })
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .OrderBy(path => path)
+            .ToArray();
+        Assert.That(rebuiltMaterialPaths, Is.EqualTo(materialPaths),
+            "Build must preserve the exact material asset set without adding or removing entries");
+        Assert.That(rebuiltMaterialPaths, Has.Length.EqualTo(11));
+        foreach (var path in rebuiltMaterialPaths)
             Assert.That(AssetDatabase.AssetPathToGUID(path), Is.EqualTo(before[path]), path);
+    }
+
+    [Test]
+    public void CaptureBatchingScopeRestoresBothFlagsWhenRenderingThrows()
+    {
+        var pipeline = GraphicsSettings.currentRenderPipeline;
+        var batchingProperty = pipeline?.GetType().GetProperty("useSRPBatcher");
+        Assert.That(pipeline, Is.Not.Null);
+        Assert.That(batchingProperty, Is.Not.Null);
+        var previousAssetBatching = (bool)batchingProperty!.GetValue(pipeline)!;
+        var previousGlobalBatching = GraphicsSettings.useScriptableRenderPipelineBatching;
+        var setupType = Type.GetType("AlbaWorld.Editor.CharacterAssetSetup, Assembly-CSharp-Editor");
+        var captureMethod = setupType?.GetMethod(
+            "RenderCameraWithTemporarySrpBatchingDisabled",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        Assert.That(captureMethod, Is.Not.Null,
+            "Capture must isolate SRP batching changes in a dedicated render-only scope");
+        var renderFailure = Assert.Throws<TargetInvocationException>(
+            () => captureMethod!.Invoke(null, new object?[] { null }));
+        Assert.That(renderFailure!.InnerException, Is.TypeOf<NullReferenceException>(),
+            "The controlled failure must occur at camera.Render after both batching setters run");
+        Assert.That((bool)batchingProperty.GetValue(pipeline)!, Is.EqualTo(previousAssetBatching));
+        Assert.That(GraphicsSettings.useScriptableRenderPipelineBatching, Is.EqualTo(previousGlobalBatching));
+    }
+
+    [Test]
+    public void RenderReviewRestoresBatchingAndWritesTheApprovedCapture()
+    {
+        var pipeline = GraphicsSettings.currentRenderPipeline;
+        var batchingProperty = pipeline?.GetType().GetProperty("useSRPBatcher");
+        Assert.That(pipeline, Is.Not.Null);
+        Assert.That(batchingProperty, Is.Not.Null);
+        var previousAssetBatching = (bool)batchingProperty!.GetValue(pipeline)!;
+        var previousGlobalBatching = GraphicsSettings.useScriptableRenderPipelineBatching;
+        var setupType = Type.GetType("AlbaWorld.Editor.CharacterAssetSetup, Assembly-CSharp-Editor");
+
+        setupType!.GetMethod("RenderReview")!.Invoke(null, null);
+
+        Assert.That((bool)batchingProperty.GetValue(pipeline)!, Is.EqualTo(previousAssetBatching));
+        Assert.That(GraphicsSettings.useScriptableRenderPipelineBatching, Is.EqualTo(previousGlobalBatching));
+        Assert.That(new FileInfo(InEngineReviewPath).Length, Is.GreaterThan(100_000));
     }
 
     [TestCase(GirlPrefabPath)]

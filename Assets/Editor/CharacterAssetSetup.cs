@@ -69,12 +69,6 @@ public static class CharacterAssetSetup
         if (girlPrefab == null || boyPrefab == null)
             throw new InvalidOperationException("Character prefabs must be built before rendering the review image");
         var previousSceneSetup = EditorSceneManager.GetSceneManagerSetup();
-        var urpAsset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
-        var previousUrpSrpBatching = urpAsset != null && urpAsset.useSRPBatcher;
-        var previousSrpBatching = GraphicsSettings.useScriptableRenderPipelineBatching;
-        if (urpAsset != null)
-            urpAsset.useSRPBatcher = false;
-        GraphicsSettings.useScriptableRenderPipelineBatching = false;
         Scene scene = default;
         RenderTexture target = null;
         Camera camera = null;
@@ -136,7 +130,7 @@ public static class CharacterAssetSetup
             if (!target.Create())
                 throw new InvalidOperationException("Failed to create the Task5 review RenderTexture");
             camera.targetTexture = target;
-            camera.Render();
+            RenderCameraWithTemporarySrpBatchingDisabled(camera);
             var previous = RenderTexture.active;
             RenderTexture.active = target;
             var screenshot = new Texture2D(1024, 1024, TextureFormat.RGBA32, false);
@@ -168,9 +162,6 @@ public static class CharacterAssetSetup
         }
         finally
         {
-            if (urpAsset != null)
-                urpAsset.useSRPBatcher = previousUrpSrpBatching;
-            GraphicsSettings.useScriptableRenderPipelineBatching = previousSrpBatching;
             if (camera != null)
                 camera.targetTexture = null;
             if (previousSceneSetup.Length > 0)
@@ -181,6 +172,32 @@ public static class CharacterAssetSetup
             {
                 target.Release();
                 UnityEngine.Object.DestroyImmediate(target);
+            }
+        }
+    }
+
+    private static void RenderCameraWithTemporarySrpBatchingDisabled(Camera camera)
+    {
+        var urpAsset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+        var previousUrpSrpBatching = urpAsset != null && urpAsset.useSRPBatcher;
+        var previousSrpBatching = GraphicsSettings.useScriptableRenderPipelineBatching;
+        try
+        {
+            if (urpAsset != null)
+                urpAsset.useSRPBatcher = false;
+            GraphicsSettings.useScriptableRenderPipelineBatching = false;
+            camera.Render();
+        }
+        finally
+        {
+            try
+            {
+                if (urpAsset != null)
+                    urpAsset.useSRPBatcher = previousUrpSrpBatching;
+            }
+            finally
+            {
+                GraphicsSettings.useScriptableRenderPipelineBatching = previousSrpBatching;
             }
         }
     }
