@@ -22,20 +22,47 @@ public static class CartoonCityCharacterAssetSetup
     [MenuItem("Alba World/Build Cartoon City Pilot")]
     public static void BuildPilot()
     {
-        RequireFile(PilotModelPath);
+        BuildPreset(PilotId, PilotSourceFile, PilotPrefabPath, DefinitionPath);
+    }
+
+    [MenuItem("Alba World/Build All Cartoon City Characters")]
+    public static void BuildAll()
+    {
+        var files = new[]
+        {
+            "Character_1_2_2.fbx", "Character_2_1_3.fbx", "Character_3_2_3.fbx", "Character_4_1_1.fbx",
+            "Character_5_2_3.fbx", "Character_5_3_1.fbx", "Character_6_2_2.fbx", "Character_8_3_1.fbx",
+            "Character_9_3_4.fbx", "Character_9_5_7.fbx", "Character_10_4_3.fbx", "Character_11_3_1.fbx",
+            "Character_B_1.fbx", "Character_Z_4.fbx", "Character_Z_9.fbx", "PoliceMan_A_4_1.fbx"
+        };
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        for (var index = 0; index < files.Length; index++)
+        {
+            var id = $"cartooncity.char.{index + 1:00}";
+            BuildPreset(id, files[index], PrefabPathFor(index + 1), DefinitionPathFor(index + 1));
+        }
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        Debug.Log($"Built {files.Length} free Cartoon City character presets.");
+    }
+
+    private static void BuildPreset(string presetId, string sourceFile, string prefabPath, string definitionPath)
+    {
+        var modelPath = $"Assets/Art3D/Characters/Source/RGPolyCartoonCity/FBX/Unity FBX/{sourceFile}";
+        RequireFile(modelPath);
         RequireFile(IdleAnimationPath);
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-        AssetDatabase.ImportAsset(PilotModelPath, ImportAssetOptions.ForceSynchronousImport);
+        AssetDatabase.ImportAsset(modelPath, ImportAssetOptions.ForceSynchronousImport);
         AssetDatabase.ImportAsset(IdleAnimationPath, ImportAssetOptions.ForceSynchronousImport);
 
-        var model = AssetDatabase.LoadAssetAtPath<GameObject>(PilotModelPath);
+        var model = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
         if (model == null)
-            throw new InvalidOperationException($"Cartoon City pilot model did not import: {PilotModelPath}");
+            throw new InvalidOperationException($"Cartoon City model did not import: {modelPath}");
 
         var instance = UnityEngine.Object.Instantiate(model);
         try
         {
-            instance.name = "CartoonCityChar01";
+            instance.name = Path.GetFileNameWithoutExtension(prefabPath);
             instance.transform.localPosition = Vector3.zero;
             instance.transform.localRotation = Quaternion.identity;
             instance.transform.localScale = Vector3.one;
@@ -48,18 +75,18 @@ public static class CartoonCityCharacterAssetSetup
             animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
             animator.runtimeAnimatorController = BuildIdleController();
 
-            EnsureAssetFolder(Path.GetDirectoryName(PilotPrefabPath)!.Replace('\\', '/'));
-            var prefab = PrefabUtility.SaveAsPrefabAsset(instance, PilotPrefabPath);
+            EnsureAssetFolder(Path.GetDirectoryName(prefabPath)!.Replace('\\', '/'));
+            var prefab = PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
             if (prefab == null)
-                throw new InvalidOperationException($"Failed to create pilot prefab: {PilotPrefabPath}");
+                throw new InvalidOperationException($"Failed to create Cartoon City prefab: {prefabPath}");
 
-            var definition = LoadOrCreateDefinition();
-            definition.presetId = PilotId;
-            definition.displayKey = "character.preset.cartooncity.01";
-            definition.sourceAsset = PilotSourceFile;
+            var definition = LoadOrCreateDefinition(definitionPath);
+            definition.presetId = presetId;
+            definition.displayKey = $"character.preset.cartooncity.{presetId.Substring("cartooncity.char.".Length)}";
+            definition.sourceAsset = sourceFile;
             definition.prefab = prefab;
             definition.free = true;
-            definition.sortOrder = 10;
+            definition.sortOrder = int.Parse(presetId[^2..]);
             definition.palettes = new[]
             {
                 new CharacterPresetPalette
@@ -85,12 +112,12 @@ public static class CartoonCityCharacterAssetSetup
             EditorUtility.SetDirty(definition);
 
             var catalog = LoadOrCreateCatalog();
-            catalog.presets.RemoveAll(entry => entry == null || entry.presetId == PilotId);
+            catalog.presets.RemoveAll(entry => entry == null || entry.presetId == presetId);
             catalog.presets.Add(definition);
             EditorUtility.SetDirty(catalog);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            Debug.Log($"Built Cartoon City pilot {PilotId}: {PilotPrefabPath}");
+            Debug.Log($"Built Cartoon City preset {presetId}: {prefabPath}");
         }
         finally
         {
@@ -98,18 +125,21 @@ public static class CartoonCityCharacterAssetSetup
         }
     }
 
-    private static CharacterPresetDefinition LoadOrCreateDefinition()
+    private static CharacterPresetDefinition LoadOrCreateDefinition(string path)
     {
-        EnsureAssetFolder("Assets/Resources/Data/CharacterPresets");
-        var definition = AssetDatabase.LoadAssetAtPath<CharacterPresetDefinition>(DefinitionPath);
+        EnsureAssetFolder(Path.GetDirectoryName(path)!.Replace('\\', '/'));
+        var definition = AssetDatabase.LoadAssetAtPath<CharacterPresetDefinition>(path);
         if (definition != null)
             return definition;
-        if (File.Exists(DefinitionPath))
-            AssetDatabase.DeleteAsset(DefinitionPath);
+        if (File.Exists(path))
+            AssetDatabase.DeleteAsset(path);
         definition = ScriptableObject.CreateInstance<CharacterPresetDefinition>();
-        AssetDatabase.CreateAsset(definition, DefinitionPath);
+        AssetDatabase.CreateAsset(definition, path);
         return definition;
     }
+
+    public static string PrefabPathFor(int index) => $"Assets/Art3D/Characters/Prefabs/CartoonCityChar{index:00}.prefab";
+    public static string DefinitionPathFor(int index) => $"Assets/Resources/Data/CharacterPresets/CartoonCityChar{index:00}.asset";
 
     private static CharacterPresetCatalog LoadOrCreateCatalog()
     {

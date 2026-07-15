@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eaf24582a62813e469b086ee8686e88e, type: 3}
-  m_Name: CartoonCityChar01
+  m_Name: CartoonCityChar04
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.CharacterPresetDefinition
-  presetId: cartooncity.char.01
-  displayKey: character.preset.cartooncity.01
-  sourceAsset: Character_1_2_2.fbx
-  prefab: {fileID: 2536316774626844523, guid: fb97ed270c460c045a8fea2585f4562e, type: 3}
+  presetId: cartooncity.char.04
+  displayKey: character.preset.cartooncity.04
+  sourceAsset: Character_4_1_1.fbx
+  prefab: {fileID: 7903295109367182779, guid: b19ce70fee5901547afa4dc3c4274ad7, type: 3}
   free: 1
-  sortOrder: 1
+  sortOrder: 4
   palettes:
   - paletteId: default
     displayKey: character.palette.default

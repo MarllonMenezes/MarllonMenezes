@@ -81,6 +81,12 @@ public sealed class LanguageService
         _en["character.preset.cartooncity.01"] = "Alba 1";
         _pt["character.preset.cartooncity.02"] = "Alba 2";
         _en["character.preset.cartooncity.02"] = "Alba 2";
+        for (var index = 1; index <= 16; index++)
+        {
+            var key = $"character.preset.cartooncity.{index:00}";
+            _pt.TryAdd(key, $"Alba {index}");
+            _en.TryAdd(key, $"Alba {index}");
+        }
         Set(code);
     }
 
