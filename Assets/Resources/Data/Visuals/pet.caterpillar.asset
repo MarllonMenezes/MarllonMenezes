@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c283ad3d75b150d4abbf3fbab2b97169, type: 3}
-  m_Name: pet.dog
+  m_Name: pet.caterpillar
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
-  definition: {fileID: 11400000, guid: 15a444b66a828b149a4630561ed9e508, type: 2}
-  prefab: {fileID: 8375671246887263302, guid: 2b9ee6c4ea8584146a9749acec628e53, type: 3}
+  definition: {fileID: 11400000, guid: 5eb7ead376948a74eaaea1e33cecd9df, type: 2}
+  prefab: {fileID: 2652011588609973977, guid: 05e91d4e5058bb640aba8500c2251c8c, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 10

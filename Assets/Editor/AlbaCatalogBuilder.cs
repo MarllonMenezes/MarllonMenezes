@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using AlbaWorld.Catalog;
 using AlbaWorld.Game;
+using AlbaWorld.Pets;
 using AlbaWorld.Runtime;
 using UnityEditor;
 using UnityEditor.Build;
@@ -53,6 +54,25 @@ public static class AlbaCatalogBuilder
         var runtime = new RuntimeCatalog();
         foreach (var definition in runtime.All())
         {
+            if (definition.category == ItemCategory.Pet)
+                continue;
+
+            yield return new DefinitionSpec(
+                definition.itemId,
+                definition.category,
+                definition.displayKey,
+                definition.free,
+                definition.tint,
+                definition.scale,
+                definition.layer);
+        }
+
+        foreach (var id in KenneyPetIds.All)
+        {
+            var definition = runtime.Get(id);
+            if (definition == null)
+                throw new BuildFailedException($"Runtime catalog is missing Kenney pet definition: {id}");
+
             yield return new DefinitionSpec(
                 definition.itemId,
                 definition.category,
@@ -98,6 +118,12 @@ public static class AlbaCatalogBuilder
         visual.definition = definition;
         visual.equipmentSlot = EquipmentSlotFor(spec.Id, spec.Category);
         visual.compatibleBodies = BodyCompatibility.Both;
+        if (spec.Category == ItemCategory.Pet)
+        {
+            visual.prefab = AssetDatabase.LoadAssetAtPath<GameObject>(KenneyPetAssetSetup.PrefabPathFor(spec.Id));
+            if (visual.prefab == null)
+                throw new BuildFailedException($"Missing Kenney pet prefab for {spec.Id}: {KenneyPetAssetSetup.PrefabPathFor(spec.Id)}");
+        }
         ApplyPlacementRules(visual, spec.Id, spec.Category);
         EditorUtility.SetDirty(visual);
         return visual;

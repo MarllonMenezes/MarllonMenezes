@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: pet.cat
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
   definition: {fileID: 11400000, guid: b3d2622162efc3f4bbc2669d9bcee134, type: 2}
-  prefab: {fileID: 0}
+  prefab: {fileID: 3297927445450081738, guid: 239d55583e6a9054ba4c795a915fdb15, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 10

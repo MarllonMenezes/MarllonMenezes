@@ -39,6 +39,28 @@ public sealed class RuntimeCatalog : IItemCatalog
 
         Add("pet.cat", ItemCategory.Pet, "item.pet.cat", true, new Color(0.96f, 0.76f, 0.55f), 1);
         Add("pet.dog", ItemCategory.Pet, "item.pet.dog", true, new Color(0.68f, 0.43f, 0.25f), 1);
+        Add("pet.beaver", ItemCategory.Pet, "item.pet.beaver", true, new Color(0.50f, 0.31f, 0.18f), 1);
+        Add("pet.bee", ItemCategory.Pet, "item.pet.bee", true, new Color(0.95f, 0.72f, 0.15f), 1);
+        Add("pet.bunny", ItemCategory.Pet, "item.pet.bunny", true, new Color(0.93f, 0.82f, 0.80f), 1);
+        Add("pet.caterpillar", ItemCategory.Pet, "item.pet.caterpillar", true, new Color(0.31f, 0.68f, 0.30f), 1);
+        Add("pet.chick", ItemCategory.Pet, "item.pet.chick", true, new Color(0.98f, 0.86f, 0.26f), 1);
+        Add("pet.cow", ItemCategory.Pet, "item.pet.cow", true, new Color(0.88f, 0.86f, 0.82f), 1);
+        Add("pet.crab", ItemCategory.Pet, "item.pet.crab", true, new Color(0.91f, 0.32f, 0.24f), 1);
+        Add("pet.deer", ItemCategory.Pet, "item.pet.deer", true, new Color(0.73f, 0.48f, 0.28f), 1);
+        Add("pet.elephant", ItemCategory.Pet, "item.pet.elephant", true, new Color(0.52f, 0.58f, 0.68f), 1);
+        Add("pet.fish", ItemCategory.Pet, "item.pet.fish", true, new Color(0.24f, 0.65f, 0.86f), 1);
+        Add("pet.fox", ItemCategory.Pet, "item.pet.fox", true, new Color(0.91f, 0.39f, 0.17f), 1);
+        Add("pet.giraffe", ItemCategory.Pet, "item.pet.giraffe", true, new Color(0.90f, 0.69f, 0.23f), 1);
+        Add("pet.hog", ItemCategory.Pet, "item.pet.hog", true, new Color(0.82f, 0.45f, 0.48f), 1);
+        Add("pet.koala", ItemCategory.Pet, "item.pet.koala", true, new Color(0.58f, 0.60f, 0.62f), 1);
+        Add("pet.lion", ItemCategory.Pet, "item.pet.lion", true, new Color(0.82f, 0.59f, 0.24f), 1);
+        Add("pet.monkey", ItemCategory.Pet, "item.pet.monkey", true, new Color(0.47f, 0.28f, 0.17f), 1);
+        Add("pet.panda", ItemCategory.Pet, "item.pet.panda", true, new Color(0.92f, 0.92f, 0.90f), 1);
+        Add("pet.parrot", ItemCategory.Pet, "item.pet.parrot", true, new Color(0.24f, 0.71f, 0.41f), 1);
+        Add("pet.penguin", ItemCategory.Pet, "item.pet.penguin", true, new Color(0.26f, 0.39f, 0.57f), 1);
+        Add("pet.pig", ItemCategory.Pet, "item.pet.pig", true, new Color(0.95f, 0.61f, 0.65f), 1);
+        Add("pet.polar", ItemCategory.Pet, "item.pet.polar", true, new Color(0.94f, 0.96f, 0.98f), 1);
+        Add("pet.tiger", ItemCategory.Pet, "item.pet.tiger", true, new Color(0.94f, 0.54f, 0.16f), 1);
         Add("pet.bow", ItemCategory.PetAccessory, "item.pet.bow", true, new Color(0.95f, 0.25f, 0.45f), 3);
         Add("pet.cap", ItemCategory.PetAccessory, "item.pet.cap", false, new Color(0.20f, 0.52f, 0.90f), 3);
         Add("pet.bandana", ItemCategory.PetAccessory, "item.pet.bandana", true, new Color(0.28f, 0.74f, 0.55f), 3);

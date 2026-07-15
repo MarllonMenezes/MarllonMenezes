@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c283ad3d75b150d4abbf3fbab2b97169, type: 3}
-  m_Name: pet.dog
+  m_Name: pet.fox
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
-  definition: {fileID: 11400000, guid: 15a444b66a828b149a4630561ed9e508, type: 2}
-  prefab: {fileID: 8375671246887263302, guid: 2b9ee6c4ea8584146a9749acec628e53, type: 3}
+  definition: {fileID: 11400000, guid: 08be7c8909160e7448aa38cd2d6173ec, type: 2}
+  prefab: {fileID: 5288644227282240802, guid: ce9990f24b3ab7f46b632340c2e97ee3, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 10
