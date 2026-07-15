@@ -44,6 +44,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
     private Transform _petMount = null!;
     private AlbaWorldUiController _ui = null!;
     private CharacterMovementController _movement = null!;
+    private CharacterWardrobeController _wardrobe = null!;
     private GameObject _hud = null!;
     private bool _started;
 
@@ -132,6 +133,11 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         _movement.Initialize(_character.transform, _save, _saveService, RoomFurnitureController.DefaultWalkableBounds, 0.22f);
         if (_ui != null)
             _movement.SetInputEnabled(_ui.Mode == AlbaWorldUiMode.Casa);
+        if (_itemCatalog != null)
+        {
+            _wardrobe = _character.GetComponent<CharacterWardrobeController>() ?? _character.AddComponent<CharacterWardrobeController>();
+            _wardrobe.Initialize(_itemCatalog, _character.transform, _save, _saveService);
+        }
     }
 
     private void CreatePet()
@@ -220,6 +226,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             SelectPet,
             () => { });
         _ui.SetPetName(_language.Get("item." + _save.pet.petId));
+        _ui.AttachWardrobe(_wardrobe);
         _movement?.SetInputEnabled(_ui.Mode == AlbaWorldUiMode.Casa);
     }
 
@@ -296,6 +303,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             Destroy(_character);
         _movement = null!;
         CreateCharacter();
+        _ui?.AttachWardrobe(_wardrobe);
         SetupPetFollow(_petAssembly?.ActiveInstance);
         Persist();
         ShowNotice(_language.Get("hud.saved"), true);

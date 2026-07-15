@@ -1,5 +1,9 @@
 using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using AlbaWorld.Catalog;
+using AlbaWorld.Game;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -42,6 +46,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
 
     private LanguageService _language = null!;
     private RoomFurnitureController _furniture = null!;
+    private CharacterWardrobeController? _wardrobe;
     private Callbacks _callbacks = new();
     private GameObject _safeRoot = null!;
     private GameObject _houseRoot = null!;
@@ -56,6 +61,15 @@ public sealed class AlbaWorldUiController : MonoBehaviour
 
     public AlbaWorldUiMode Mode { get; private set; } = AlbaWorldUiMode.Casa;
     public event Action<AlbaWorldUiMode>? ModeChanged;
+
+    public void AttachWardrobe(CharacterWardrobeController wardrobe)
+    {
+        if (_wardrobe != null)
+            _wardrobe.NoticeRequested -= OnWardrobeNotice;
+        _wardrobe = wardrobe;
+        if (_wardrobe != null)
+            _wardrobe.NoticeRequested += OnWardrobeNotice;
+    }
 
     public void Initialize(
         LanguageService language,
@@ -218,18 +232,59 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         Anchor(heading.rectTransform, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.98f));
         var categories = new[]
         {
+            ItemCategory.Skin, ItemCategory.Hair, ItemCategory.Outfit, ItemCategory.Shoes, ItemCategory.HumanAccessory
+        };
+        var categoryKeys = new[]
+        {
             "wardrobe.skin", "wardrobe.hair", "wardrobe.outfit", "wardrobe.shoes", "wardrobe.accessories"
         };
+        var content = new GameObject("Wardrobe Content", typeof(RectTransform));
+        content.transform.SetParent(panel.transform, false);
+        Anchor((RectTransform)content.transform, new Vector2(0.05f, 0.08f), new Vector2(0.95f, 0.66f));
         for (var index = 0; index < categories.Length; index++)
         {
-            var column = index % 3;
-            var row = index / 3;
-            var min = new Vector2(0.05f + column * 0.31f, 0.68f - row * 0.22f);
-            var max = new Vector2(min.x + 0.28f, min.y + 0.17f);
-            AddButton(panel.transform, _language.Get(categories[index]), new Color(0.22f + column * 0.07f, 0.28f + row * 0.04f, 0.48f), () => ShowNotice(_language.Get("wardrobe.choose"), true), min, max, 15);
+            var category = categories[index];
+            var min = new Vector2(0.05f + index * 0.19f, 0.70f);
+            var max = new Vector2(min.x + 0.17f, 0.84f);
+            AddButton(panel.transform, _language.Get(categoryKeys[index]), new Color(0.22f + index * 0.04f, 0.28f, 0.48f), () =>
+            {
+                _wardrobe?.SelectCategory(category);
+                ShowWardrobeItems(content.transform, category);
+            }, min, max, 14);
         }
+        ShowWardrobeItems(content.transform, ItemCategory.Skin);
         AddButton(_dressRoot.transform, _language.Get("menu.back"), new Color(0.35f, 0.30f, 0.55f), EnterHouseMode, new Vector2(0.02f, 0f), new Vector2(0.18f, 0.06f), 16);
         AddButton(_dressRoot.transform, _language.Get("hud.save"), Mint, EnterHouseMode, new Vector2(0.82f, 0f), new Vector2(0.98f, 0.06f), 16);
+    }
+
+    private void ShowWardrobeItems(Transform content, ItemCategory category)
+    {
+        ClearContent(content);
+        if (_wardrobe == null)
+        {
+            AddButton(content, _language.Get("wardrobe.choose"), PanelSoft, () => { }, new Vector2(0.05f, 0.35f), new Vector2(0.95f, 0.65f), 15);
+            return;
+        }
+
+        var items = _wardrobe.ItemsForCategory(category).ToArray();
+        for (var index = 0; index < items.Length; index++)
+        {
+            var visual = items[index];
+            var column = index % 4;
+            var row = index / 4;
+            var min = new Vector2(0.02f + column * 0.245f, 0.62f - row * 0.34f);
+            var max = new Vector2(min.x + 0.22f, min.y + 0.27f);
+            var itemId = visual.ItemId;
+            var label = _language.Get(visual.definition.displayKey);
+            if (label == visual.definition.displayKey)
+                label = itemId;
+            var button = AddButton(content, label, visual.definition.tint, () =>
+            {
+                var applied = _wardrobe.TryApply(itemId);
+                ShowNotice(applied ? _language.Get("hud.saved") : _language.Get("photo.error"), applied);
+            }, min, max, 13);
+            button.interactable = _wardrobe.CanUse(itemId);
+        }
     }
 
     private void ShowFurniturePage(Transform content)
@@ -300,6 +355,18 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         }
     }
 
+    private static void ClearContent(Transform content)
+    {
+        for (var index = content.childCount - 1; index >= 0; index--)
+        {
+            var child = content.GetChild(index).gameObject;
+            if (Application.isPlaying)
+                Destroy(child);
+            else
+                DestroyImmediate(child);
+        }
+    }
+
     private void DestroyModeRoots()
     {
         _selectionButtons.Clear();
@@ -315,10 +382,14 @@ public sealed class AlbaWorldUiController : MonoBehaviour
 
     private void OnFurnitureSelectionChanged(string _) => SetFurnitureSelection(_furniture.HasSelection);
 
+    private void OnWardrobeNotice(string _) => ShowNotice(_language.Get("wardrobe.visualUnavailable"), false);
+
     private void OnDestroy()
     {
         if (_furniture != null)
             _furniture.SelectionChanged -= OnFurnitureSelectionChanged;
+        if (_wardrobe != null)
+            _wardrobe.NoticeRequested -= OnWardrobeNotice;
     }
 
     private void ClearNotice()
