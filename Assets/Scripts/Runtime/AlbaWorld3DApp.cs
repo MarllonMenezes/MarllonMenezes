@@ -42,8 +42,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
     private GameObject _character = null!;
     private Transform _worldRoot = null!;
     private Transform _petMount = null!;
-    private Text _petName = null!;
-    private Text _notice = null!;
+    private AlbaWorldUiController _ui = null!;
     private GameObject _hud = null!;
     private bool _started;
 
@@ -151,8 +150,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
     {
         NormalizeHeight(instance, 1.1f);
         SetupPetFollow(instance);
-        if (_petName != null)
-            _petName.text = _language.Get("item." + instance.name);
+        _ui?.SetPetName(_language.Get("item." + instance.name));
     }
 
     private void SetupPetFollow(GameObject? instance)
@@ -199,86 +197,23 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
     {
         var canvasObject = new GameObject("Alba World HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         _hud = canvasObject;
-        var canvas = canvasObject.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 100;
-        var scaler = canvasObject.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-
-        var top = Panel(canvas.transform, "TopBar", PanelColor, new Vector2(0.035f, 0.84f), new Vector2(0.965f, 0.97f));
-        var title = Label(top.transform, "Alba World", 44, Color.white, TextAnchor.MiddleLeft);
-        Anchor(title.rectTransform, new Vector2(0.03f, 0.08f), new Vector2(0.45f, 0.94f));
-        var tagline = Label(top.transform, _language.Get("hud.tagline"), 18, new Color(0.78f, 0.78f, 0.90f), TextAnchor.MiddleLeft);
-        Anchor(tagline.rectTransform, new Vector2(0.03f, -0.19f), new Vector2(0.48f, 0.38f));
-        var offline = Label(top.transform, _language.Get("hud.offline"), 16, Mint, TextAnchor.MiddleRight);
-        Anchor(offline.rectTransform, new Vector2(0.70f, 0.14f), new Vector2(0.97f, 0.86f));
-
-        var card = Panel(canvas.transform, "PetCard", PanelColor, new Vector2(0.72f, 0.36f), new Vector2(0.965f, 0.79f));
-        var petHeading = Label(card.transform, _language.Get("hud.pet"), 18, new Color(0.72f, 0.73f, 0.84f), TextAnchor.MiddleLeft);
-        Anchor(petHeading.rectTransform, new Vector2(0.08f, 0.82f), new Vector2(0.92f, 0.98f));
-        _petName = Label(card.transform, _language.Get("item." + _save.pet.petId), 28, Color.white, TextAnchor.MiddleLeft);
-        Anchor(_petName.rectTransform, new Vector2(0.08f, 0.60f), new Vector2(0.92f, 0.84f));
-        var petHint = Label(card.transform, _language.Get("hud.choosePet"), 15, new Color(0.70f, 0.70f, 0.80f), TextAnchor.MiddleLeft);
-        Anchor(petHint.rectTransform, new Vector2(0.08f, 0.42f), new Vector2(0.92f, 0.59f));
-        AddPetButton(card.transform, "pet.cat", new Vector2(0.08f, 0.17f), new Vector2(0.29f, 0.37f), Pink);
-        AddPetButton(card.transform, "pet.dog", new Vector2(0.32f, 0.17f), new Vector2(0.53f, 0.37f), Mint);
-        AddPetButton(card.transform, "pet.fox", new Vector2(0.56f, 0.17f), new Vector2(0.77f, 0.37f), new Color(1f, 0.61f, 0.25f));
-        AddPetButton(card.transform, "pet.panda", new Vector2(0.80f, 0.17f), new Vector2(0.92f, 0.37f), new Color(0.76f, 0.70f, 1f));
-
-        AddFurnitureTray(canvas.transform);
-
-        var bottom = Panel(canvas.transform, "BottomBar", PanelColor, new Vector2(0.035f, 0.035f), new Vector2(0.965f, 0.17f));
-        AddButton(bottom.transform, _language.Get("hud.switchCharacter"), new Color(0.35f, 0.30f, 0.55f), SwitchCharacter, new Vector2(0.02f, 0.18f), new Vector2(0.24f, 0.82f));
-        AddButton(bottom.transform, _language.Get("hud.photo"), Pink, CapturePhoto, new Vector2(0.27f, 0.18f), new Vector2(0.48f, 0.82f));
-        AddButton(bottom.transform, _language.Get("hud.language"), new Color(0.22f, 0.28f, 0.48f), ToggleLanguage, new Vector2(0.51f, 0.18f), new Vector2(0.65f, 0.82f));
-        AddButton(bottom.transform, _language.Get("hud.room"), new Color(0.25f, 0.47f, 0.50f), ChangeRoomStyle, new Vector2(0.68f, 0.18f), new Vector2(0.84f, 0.82f));
-        _notice = Label(bottom.transform, string.Empty, 16, Mint, TextAnchor.MiddleRight);
-        Anchor(_notice.rectTransform, new Vector2(0.85f, 0.18f), new Vector2(0.98f, 0.82f));
-    }
-
-    private void AddPetButton(Transform parent, string petId, Vector2 min, Vector2 max, Color color)
-    {
-        AddButton(parent, _language.Get("item." + petId), color, () => SelectPet(petId), min, max, 14);
-    }
-
-    private void AddFurnitureTray(Transform parent)
-    {
-        var tray = Panel(parent, "FurnitureTray", PanelColor, new Vector2(0.035f, 0.24f), new Vector2(0.285f, 0.80f));
-        var heading = Label(tray.transform, _language.Get("hud.furniture"), 18, new Color(0.72f, 0.73f, 0.84f), TextAnchor.MiddleLeft);
-        Anchor(heading.rectTransform, new Vector2(0.08f, 0.89f), new Vector2(0.92f, 0.99f));
-
-        var ids = new[]
-        {
-            "furniture.bed", "furniture.sofa", "furniture.table",
-            "furniture.chair", "furniture.shelf", "furniture.lamp",
-            "furniture.plant", "furniture.rug", "furniture.book"
-        };
-        for (var index = 0; index < ids.Length; index++)
-        {
-            var column = index % 3;
-            var row = index / 3;
-            var min = new Vector2(0.05f + column * 0.315f, 0.63f - row * 0.19f);
-            var max = new Vector2(min.x + 0.285f, min.y + 0.15f);
-            var itemId = ids[index];
-            AddButton(
-                tray.transform,
-                _language.Get("item." + itemId),
-                new Color(0.22f + column * 0.06f, 0.28f + row * 0.03f, 0.48f + row * 0.03f),
-                () => AddFurniture(itemId),
-                min,
-                max,
-                12);
-        }
-
-        AddButton(tray.transform, _language.Get("hud.smaller"), new Color(0.28f, 0.34f, 0.52f), () => ScaleFurniture(-0.1f), new Vector2(0.04f, 0.04f), new Vector2(0.18f, 0.14f), 10);
-        AddButton(tray.transform, _language.Get("hud.larger"), new Color(0.31f, 0.52f, 0.55f), () => ScaleFurniture(0.1f), new Vector2(0.19f, 0.04f), new Vector2(0.33f, 0.14f), 10);
-        AddButton(tray.transform, _language.Get("hud.mirror"), new Color(0.53f, 0.35f, 0.58f), MirrorFurniture, new Vector2(0.34f, 0.04f), new Vector2(0.50f, 0.14f), 10);
-        AddButton(tray.transform, _language.Get("hud.front"), new Color(0.25f, 0.42f, 0.58f), BringFurnitureForward, new Vector2(0.51f, 0.04f), new Vector2(0.65f, 0.14f), 10);
-        AddButton(tray.transform, _language.Get("hud.back"), new Color(0.35f, 0.34f, 0.52f), SendFurnitureBackward, new Vector2(0.66f, 0.04f), new Vector2(0.80f, 0.14f), 10);
-        AddButton(tray.transform, _language.Get("hud.remove"), new Color(0.70f, 0.25f, 0.38f), RemoveFurniture, new Vector2(0.81f, 0.04f), new Vector2(0.96f, 0.14f), 10);
+        _ui = canvasObject.AddComponent<AlbaWorldUiController>();
+        _ui.Initialize(
+            _language,
+            _furniture,
+            AddFurniture,
+            ScaleFurniture,
+            MirrorFurniture,
+            BringFurnitureForward,
+            SendFurnitureBackward,
+            RemoveFurniture,
+            SwitchCharacter,
+            CapturePhoto,
+            ChangeRoomStyle,
+            ToggleLanguage,
+            SelectPet,
+            () => { });
+        _ui.SetPetName(_language.Get("item." + _save.pet.petId));
     }
 
     private void AddFurniture(string itemId)
@@ -339,7 +274,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 
         _save.pet.petId = id;
         _save.selectedPetId = id;
-        _petName.text = _language.Get("item." + id);
+        _ui?.SetPetName(_language.Get("item." + id));
         ShowNotice(_language.Get("hud.saved"), true);
     }
 
@@ -377,24 +312,13 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         _language.Set(_language.Code == "pt-BR" ? "en" : "pt-BR");
         _save.languageCode = _language.Code;
         Persist();
+        _ui?.RefreshLanguage();
         ShowNotice(_language.Get("hud.saved"), true);
     }
 
     private void ShowNotice(string message, bool success)
     {
-        if (_notice == null)
-            return;
-
-        _notice.text = message;
-        _notice.color = success ? Mint : new Color(1f, 0.45f, 0.55f);
-        CancelInvoke(nameof(ClearNotice));
-        Invoke(nameof(ClearNotice), 2.2f);
-    }
-
-    private void ClearNotice()
-    {
-        if (_notice != null)
-            _notice.text = string.Empty;
+        _ui?.ShowNotice(message, success);
     }
 
     private void Persist()

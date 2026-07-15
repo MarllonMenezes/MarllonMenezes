@@ -23,7 +23,7 @@ public sealed class HouseDressLocalizationTests
             Assert.That(value, Does.Not.EqualTo(key), key);
             Assert.That(value, Does.Not.Contain("Ã"), key);
             Assert.That(value, Does.Not.Contain("Â"), key);
-            Assert.That(value, Does.Not.Contain("�"), key);
+            Assert.That(value.IndexOf('\uFFFD'), Is.EqualTo(-1), key);
         }
     }
 }

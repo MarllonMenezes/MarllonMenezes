@@ -12,6 +12,10 @@ namespace AlbaWorld.Runtime;
 /// <summary>Owns furniture instances and bounded per-room layout persistence.</summary>
 public sealed class RoomFurnitureController : MonoBehaviour
 {
+    public static Bounds DefaultWalkableBounds => new(
+        new Vector3(0f, 0.22f, 0.25f),
+        new Vector3(3.8f, 0.1f, 3.0f));
+
     [SerializeField] private float _minimumX = -4.4f;
     [SerializeField] private float _maximumX = 4.1f;
     [SerializeField] private float _minimumZ = -2.1f;

@@ -1,7 +1,9 @@
 {
   "name": "AlbaWorld.Runtime",
   "rootNamespace": "AlbaWorld",
-  "references": [],
+  "references": [
+    "Unity.TextMeshPro"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
