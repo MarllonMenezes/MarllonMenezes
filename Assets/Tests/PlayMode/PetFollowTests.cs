@@ -32,7 +32,7 @@ public sealed class PetFollowTests
 
         yield return new WaitForSeconds(0.5f);
 
-        Assert.That(fixture.Follow.transform.position.y, Is.GreaterThanOrEqualTo(0f));
+        Assert.That(fixture.Follow.transform.position.y, Is.EqualTo(fixture.Follow.FloorHeight).Within(0.001f));
         Assert.That(Mathf.Abs(Mathf.DeltaAngle(fixture.Follow.transform.eulerAngles.x, 0f)), Is.LessThan(0.01f));
         Assert.That(Mathf.Abs(Mathf.DeltaAngle(fixture.Follow.transform.eulerAngles.z, 0f)), Is.LessThan(0.01f));
     }

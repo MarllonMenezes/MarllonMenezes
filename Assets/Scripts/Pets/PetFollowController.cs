@@ -49,9 +49,10 @@ public sealed class PetFollowController : MonoBehaviour
 
         var current = transform.position;
         var desired = followTarget.TransformPoint(followOffset);
-        desired.y = Mathf.Max(floorHeight, desired.y);
+        // Pets stay grounded even when the anchor has a different vertical position.
+        desired.y = floorHeight;
         var next = Vector3.MoveTowards(current, desired, followSpeed * Time.deltaTime);
-        next.y = Mathf.Max(floorHeight, next.y);
+        next.y = floorHeight;
         transform.position = next;
 
         var movement = next - current;
