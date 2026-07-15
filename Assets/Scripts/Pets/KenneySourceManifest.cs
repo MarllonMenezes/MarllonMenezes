@@ -16,19 +16,30 @@ public sealed class KenneySourceManifest
 {
     private const string ManifestPath = "Assets/Art3D/Pets/Source/KenneyCubePets/manifest.json";
 
-    private KenneySourceManifest(string[] animalIds, string license)
+    private KenneySourceManifest(string[] animalIds, IReadOnlyDictionary<string, string> sourcesById, string license)
     {
         AnimalIds = animalIds;
+        SourcesById = sourcesById;
         License = license;
     }
 
     public string[] AnimalIds { get; }
 
+    /// <summary>Authoritative source filename for each manifest animal ID.</summary>
+    public IReadOnlyDictionary<string, string> SourcesById { get; }
+
     public string License { get; }
+
+    public string SourceFor(string animalId)
+    {
+        if (string.IsNullOrWhiteSpace(animalId) || !SourcesById.TryGetValue(animalId, out var source))
+            throw new KeyNotFoundException($"Kenney source manifest does not contain animal ID '{animalId}'.");
+        return source;
+    }
 
     public static KenneySourceManifest LoadForTests()
     {
-        var path = Path.GetFullPath(ManifestPath);
+        var path = AbsoluteProjectPath(ManifestPath);
         if (!File.Exists(path))
             throw new FileNotFoundException($"Kenney source manifest is missing: {ManifestPath}", path);
 
@@ -59,7 +70,15 @@ public sealed class KenneySourceManifest
         Validate(data, animals);
 
         var ids = animals.Select(animal => animal.id).ToArray();
-        return new KenneySourceManifest(ids, data.license);
+        var sourcesById = animals.ToDictionary(animal => animal.id, animal => animal.source, StringComparer.Ordinal);
+        return new KenneySourceManifest(ids, sourcesById, data.license);
+    }
+
+    private static string AbsoluteProjectPath(string assetPath)
+    {
+        var projectRoot = Directory.GetParent(Application.dataPath)?.FullName
+            ?? throw new InvalidOperationException("Unity project root could not be resolved from Application.dataPath.");
+        return Path.Combine(projectRoot, assetPath.Replace('/', Path.DirectorySeparatorChar));
     }
 
     private static void Validate(ManifestData data, IReadOnlyCollection<AnimalEntry> animals)
@@ -79,6 +98,8 @@ public sealed class KenneySourceManifest
         {
             if (animal == null || string.IsNullOrWhiteSpace(animal.id) || string.IsNullOrWhiteSpace(animal.source))
                 throw new InvalidDataException($"Kenney source manifest contains an incomplete animal entry: {ManifestPath}");
+            if (Path.IsPathRooted(animal.source) || animal.source.Replace('\\', '/').Split('/').Contains("..", StringComparer.Ordinal))
+                throw new InvalidDataException($"Kenney source manifest contains an unsafe source path for '{animal.id}': {ManifestPath}");
             if (!ids.Add(animal.id))
                 throw new InvalidDataException($"Kenney source manifest contains duplicate animal id '{animal.id}': {ManifestPath}");
         }

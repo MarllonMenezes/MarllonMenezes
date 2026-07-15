@@ -56,8 +56,8 @@ public static class KenneyPetAssetSetup
 
     public static string PrefabPathFor(string animalId)
     {
-        if (string.IsNullOrWhiteSpace(animalId) || !animalId.StartsWith("pet.", StringComparison.Ordinal))
-            throw new ArgumentException("Animal id must use the pet.* form.", nameof(animalId));
+        if (string.IsNullOrWhiteSpace(animalId) || !KenneyPetIds.All.Contains(animalId, StringComparer.Ordinal))
+            throw new ArgumentException($"Unknown Kenney pet ID '{animalId}'. Expected one of KenneyPetIds.All.", nameof(animalId));
 
         return $"{PrefabRoot}/{animalId.Substring("pet.".Length)}.prefab";
     }
@@ -66,8 +66,12 @@ public static class KenneyPetAssetSetup
     public static void Setup()
     {
         var manifest = KenneySourceManifest.LoadForTests();
-        if (!KenneyPetIds.All.All(id => manifest.AnimalIds.Contains(id, StringComparer.Ordinal)))
-            throw new InvalidDataException("Kenney source manifest does not contain all authoritative pet IDs.");
+        var manifestIds = new HashSet<string>(manifest.AnimalIds, StringComparer.Ordinal);
+        var expectedIds = new HashSet<string>(KenneyPetIds.All, StringComparer.Ordinal);
+        if (!manifestIds.SetEquals(expectedIds))
+            throw new InvalidDataException("Kenney source manifest IDs must exactly match KenneyPetIds.All.");
+        foreach (var animalId in KenneyPetIds.All)
+            _ = manifest.SourceFor(animalId);
 
         EnsureAssetFolder(MaterialRoot);
         EnsureAssetFolder(PrefabRoot);
@@ -76,7 +80,7 @@ public static class KenneyPetAssetSetup
         var material = CreateOrUpdateMaterial();
         foreach (var animalId in KenneyPetIds.All)
         {
-            var sourcePath = SourcePathFor(animalId);
+            var sourcePath = SourcePathFor(animalId, manifest);
             ConfigureModelImporter(sourcePath);
             CreateOrUpdatePrefab(animalId, sourcePath, material);
         }
@@ -86,15 +90,20 @@ public static class KenneyPetAssetSetup
         Debug.Log($"Built {KenneyPetIds.All.Length} deterministic Kenney pet prefabs.");
     }
 
-    private static string SourcePathFor(string animalId)
+    private static string SourcePathFor(string animalId, KenneySourceManifest manifest)
     {
-        var animalName = animalId.Substring("pet.".Length);
-        return $"{SourceRoot}/animal-{animalName}.fbx";
+        if (!KenneyPetIds.All.Contains(animalId, StringComparer.Ordinal))
+            throw new ArgumentException($"Unknown Kenney pet ID '{animalId}'.", nameof(animalId));
+        var source = manifest.SourceFor(animalId).Replace('\\', '/');
+        if (Path.IsPathRooted(source) || source.Split('/').Contains("..", StringComparer.Ordinal))
+            throw new InvalidDataException($"Unsafe Kenney source path for {animalId}: {source}");
+        return $"{SourceRoot}/{source}";
     }
 
     private static void ConfigureModelImporter(string sourcePath)
     {
-        if (!File.Exists(sourcePath))
+        var absoluteSourcePath = AbsoluteProjectPath(sourcePath);
+        if (!File.Exists(absoluteSourcePath))
             throw new FileNotFoundException($"Missing Kenney pet source: {sourcePath}", sourcePath);
 
         var importer = AssetImporter.GetAtPath(sourcePath) as ModelImporter
@@ -212,6 +221,13 @@ public static class KenneyPetAssetSetup
                 AssetDatabase.CreateFolder(current, parts[index]);
             current = next;
         }
+    }
+
+    private static string AbsoluteProjectPath(string assetPath)
+    {
+        var projectRoot = Directory.GetParent(Application.dataPath)?.FullName
+            ?? throw new InvalidOperationException("Unity project root could not be resolved from Application.dataPath.");
+        return Path.Combine(projectRoot, assetPath.Replace('/', Path.DirectorySeparatorChar));
     }
 
     private sealed class PetImportRule
