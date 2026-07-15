@@ -84,4 +84,16 @@ Focused evidence: \`work/furniture-prefab-green.xml\` (1/1), \`work/furniture-ca
 
 ## Assets externos
 
+## Atualização: Casa, Vestir e sala jogável
+
+Esta atualização substitui a antiga HUD sobreposta por dois modos claros no mesmo cenário:
+
+- **Casa**: personagem anda por clique/toque ou WASD/setas; o centro da sala fica reservado para caminhar.
+- **Vestir**: a movimentação e os controles de móveis ficam ocultos; categorias e itens aparecem em cartões com texto localizado.
+- **Móveis**: os modelos Kenney são centralizados pelo pivô visual, entram em slots periféricos, não podem ocupar o centro nem sobrepor outro móvel, e possuem `Excluir` e `Desfazer`.
+- **Persistência**: posição do personagem, layout por cômodo e loadout de roupas continuam no JSON local existente, sem novo servidor ou conta.
+- **Layout**: safe area de 2%–98%, barra superior e dock inferior separados do conteúdo, sem `PetCard` antigo e sem palco cilíndrico central.
+
+O relatório reproduzível desta etapa está em [`docs/testing/house-dress-layout-test-report.md`](testing/house-dress-layout-test-report.md). Para testar no PC, abra `Assets/Scenes/Main.unity`, escolha `Game > 16:9` ou `20:9` e pressione Play; o mouse simula toque e o teclado usa WASD/setas.
+
 Para qualquer asset futuro, registrar licença comercial, redistribuição, atribuição, URL, autor, restrições editoriais, compatibilidade de rig, polígonos, texturas e impacto Android antes da importação. O pacote Kenney acima já possui esses registros legais; não importar outros pacotes Kenney sem decisão explícita.
