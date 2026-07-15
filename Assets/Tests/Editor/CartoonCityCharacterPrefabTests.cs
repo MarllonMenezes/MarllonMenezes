@@ -37,7 +37,6 @@ public sealed class CartoonCityCharacterPrefabTests
             bounds.Encapsulate(renderer.bounds);
         Assert.That(IsFinite(bounds.center) && IsFinite(bounds.size), Is.True);
         Assert.That(bounds.size.y, Is.GreaterThan(0.25f));
-        Assert.That(prefab.GetComponentsInChildren<Animator>(true).Length, Is.EqualTo(1));
     }
 
     private static bool IsFinite(Vector3 value) =>

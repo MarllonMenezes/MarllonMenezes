@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using AlbaWorld.Catalog;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace AlbaWorld.Editor;
@@ -67,13 +66,6 @@ public static class CartoonCityCharacterAssetSetup
             instance.transform.localRotation = Quaternion.identity;
             instance.transform.localScale = Vector3.one;
             RemoveSceneOnlyComponents(instance);
-
-            var animator = instance.GetComponent<Animator>();
-            if (animator == null)
-                animator = instance.AddComponent<Animator>();
-            animator.applyRootMotion = false;
-            animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
-            animator.runtimeAnimatorController = BuildIdleController();
 
             EnsureAssetFolder(Path.GetDirectoryName(prefabPath)!.Replace('\\', '/'));
             var prefab = PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
@@ -152,29 +144,6 @@ public static class CartoonCityCharacterAssetSetup
         catalog = ScriptableObject.CreateInstance<CharacterPresetCatalog>();
         AssetDatabase.CreateAsset(catalog, CatalogPath);
         return catalog;
-    }
-
-    private static RuntimeAnimatorController BuildIdleController()
-    {
-        EnsureAssetFolder("Assets/Art3D/Characters/Controllers");
-        var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
-        if (controller == null)
-        {
-            controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
-        }
-
-        var clip = AssetDatabase.LoadAllAssetsAtPath(IdleAnimationPath).OfType<AnimationClip>()
-            .FirstOrDefault(candidate => !candidate.name.StartsWith("__preview__", StringComparison.Ordinal));
-        if (clip == null)
-            return controller;
-
-        var machine = controller.layers[0].stateMachine;
-        var idle = machine.states.FirstOrDefault(state => state.state != null && state.state.name == "Idle").state;
-        if (idle == null)
-            idle = machine.AddState("Idle");
-        idle.motion = clip;
-        EditorUtility.SetDirty(controller);
-        return controller;
     }
 
     private static void RemoveSceneOnlyComponents(GameObject root)
