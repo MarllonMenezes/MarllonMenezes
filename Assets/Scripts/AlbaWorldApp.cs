@@ -443,7 +443,6 @@ public sealed class PetPersistenceCoordinator
     public bool Restore()
     {
         SaveMigration.Upgrade(_save);
-        var hadActivePet = _assembly.ActiveInstance != null;
         var applied = _assembly.TryApply(_save.pet);
         if (applied)
         {
@@ -452,16 +451,25 @@ public sealed class PetPersistenceCoordinator
         }
 
         // PetAssemblyController intentionally reports a fallback as false so callers can
-        // distinguish it from an exact selection. On a fresh boot, normalize that fallback
-        // to keep future JSON writes free of the missing ID.
-        if (!hadActivePet && _assembly.ActiveInstance != null && _assembly.ActivePetId == DefaultPetId)
+        // distinguish it from an exact selection. It also preserves an existing valid
+        // instance when the requested ID is bad, so explicitly apply the safe cat fallback
+        // on every failed restore, including reconnects with an active dog/panda.
+        var fallback = CloneLoadout(_save.pet);
+        fallback.petId = DefaultPetId;
+        var fallbackApplied = _assembly.TryApply(fallback);
+        if (fallbackApplied && _assembly.ActiveInstance != null && _assembly.ActivePetId == DefaultPetId)
         {
-            _save.pet.petId = DefaultPetId;
-            _save.selectedPetId = DefaultPetId;
+            SetPetId(DefaultPetId);
             return true;
         }
 
-        return _assembly.ActiveInstance != null;
+        // If even the safe fallback is unavailable, reject the restore explicitly and
+        // mirror whichever valid instance remains so the in-memory save is coherent.
+        if (_assembly.ActiveInstance != null)
+            MirrorActivePetId();
+        else
+            SetPetId(DefaultPetId);
+        return false;
     }
 
     /// <summary>Reparents the shared active root to a bounded room context.</summary>
@@ -500,8 +508,13 @@ public sealed class PetPersistenceCoordinator
         if (string.IsNullOrWhiteSpace(_assembly.ActivePetId))
             return;
 
-        _save.pet.petId = _assembly.ActivePetId;
-        _save.selectedPetId = _assembly.ActivePetId;
+        SetPetId(_assembly.ActivePetId);
+    }
+
+    private void SetPetId(string petId)
+    {
+        _save.pet.petId = petId;
+        _save.selectedPetId = petId;
     }
 
     private static PetLoadoutData CloneLoadout(PetLoadoutData source)

@@ -22,6 +22,21 @@ public sealed class PetPersistenceTests
         Assert.That(output.pet.petId, Is.EqualTo("pet.panda"));
     }
 
+    [Test]
+    public void Schema3Legacy2DSelectionMigratesWhenPetLoadoutIsStillDefault()
+    {
+        var input = new GameSaveData
+        {
+            schemaVersion = SaveMigration.CurrentSchemaVersion,
+            selectedPetId = "pet.panda",
+            pet = new PetLoadoutData()
+        };
+
+        var output = SaveMigration.Upgrade(input);
+
+        Assert.That(output.pet.petId, Is.EqualTo("pet.panda"));
+    }
+
     [UnityTest]
     public IEnumerator ValidSelectionSavesOnlyAfterAssemblyApply()
     {
@@ -79,6 +94,29 @@ public sealed class PetPersistenceTests
 
         Assert.That(fixture.Controller.ActivePetId, Is.EqualTo("pet.cat"));
         Assert.That(flow.ActivePetRoot, Is.Not.Null);
+        Assert.That(save.pet.petId, Is.EqualTo("pet.cat"));
+        Assert.That(save.selectedPetId, Is.EqualTo("pet.cat"));
+        Assert.That(service.SaveCount, Is.Zero);
+    }
+
+    [UnityTest]
+    public IEnumerator RestoreInvalidPetReplacesAnAlreadyActivePetAndRepairsTheSave()
+    {
+        using var fixture = PetTestFactory.Create();
+        var save = new GameSaveData();
+        var service = new RecordingSaveService();
+        var flow = new PetPersistenceCoordinator(save, service, fixture.Controller);
+
+        Assert.That(flow.TrySelect("pet.dog"), Is.True);
+        yield return null;
+        service.Reset();
+        save.pet.petId = "pet.missing";
+        save.selectedPetId = "pet.missing";
+
+        Assert.That(flow.Restore(), Is.True);
+        yield return null;
+
+        Assert.That(fixture.Controller.ActivePetId, Is.EqualTo("pet.cat"));
         Assert.That(save.pet.petId, Is.EqualTo("pet.cat"));
         Assert.That(save.selectedPetId, Is.EqualTo("pet.cat"));
         Assert.That(service.SaveCount, Is.Zero);
