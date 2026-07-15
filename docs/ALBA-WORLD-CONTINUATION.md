@@ -31,6 +31,10 @@ Origem e licença:
 
 ## Auditoria e evidências
 
+### Historical Task 6 baseline
+
+The original Task 6 evidence below is retained for traceability only. Its Play Mode result (21/21 in `work/task6-kenney-playmode.xml`) predates the final review corrections and is not the current acceptance result.
+
 O relatório completo está em [`docs/testing/kenney-pets-test-report.md`](testing/kenney-pets-test-report.md). Os comandos novos produziram:
 
 - manifesto Edit Mode: 2/2 aprovados (`work/task6-kenney-source.xml`);
@@ -41,6 +45,13 @@ O relatório completo está em [`docs/testing/kenney-pets-test-report.md`](testi
 - auditoria temporária de triângulos: 1/1 aprovada (`work/task6-kenney-triangles.xml`, helper removido após a medição).
 
 Os 24 prefabs medem entre 422 e 951 triângulos. Isso atende ao teto atual de 7.000 triângulos validado pelo teste; fica abaixo do alvo de design de 4.000–7.000 para um pet equipado e deve ser considerado no balanceamento visual/performance futuro, sem adicionar geometria nesta etapa.
+
+### Final review evidence (current)
+
+- Catalog Edit Mode: 3/3 passed (`work/task7-green-credit-final.xml`), including the localized in-game credit.
+- Play Mode: 24/24 passed (`work/task7-green-playmode-final.xml`), covering the complete final pet set plus color, deferred-accessory, and fallback-save behavior.
+- .NET tests: 14/14 passed (`dotnet test Tools\\CoreTests\\AlbaWorld.CoreTests.csproj --no-restore`).
+- Android release gate: **blocked**, not approved. The development APK pipeline repeatedly returned Burst `bcl.exe`/`AndroidPlayerBuildProgram` `ExitCode: 4`, produced no APK, and `adb devices` listed no devices or emulators. See `work/task7-android-apk.log`.
 
 ## Revisão visual e limitações conhecidas
 

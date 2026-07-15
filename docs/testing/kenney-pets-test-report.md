@@ -36,7 +36,7 @@ Os 24 pets Kenney estão disponíveis offline como prefabs locais, com IDs está
 
 The current prefab test enforces the project ceiling of 7,000 triangles, and every species is below it. The original design target was 4,000–7,000 triangles per equipped pet; these intentionally low-poly Kenney meshes are below that lower target, which is recorded as a follow-up art/performance consideration rather than a reason to add geometry in this task.
 
-## Fresh commands and evidence
+## Historical Task 6 baseline (retained for traceability)
 
 Commands were run from the project root. Unity commands intentionally omit `-quit`; the Test Framework exits after writing its result file.
 
@@ -63,6 +63,8 @@ Triangle counts were emitted by a temporary editor-only audit test and saved at 
 
 The final review follow-up was verified with fresh commands after the implementation:
 
+Android is a release gate and remains **BLOCKED (not approved)**: the Burst `bcl.exe`/`AndroidPlayerBuildProgram` path repeatedly returned `ExitCode: 4`, produced no APK, and `adb devices` returned an empty device/emulator list.
+
 ```powershell
 & 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneyPetCatalogTests -testResults work/task7-green-credit-final.xml -logFile work/task7-green-credit-final.log
 # result: Passed, 3 total, 3 passed, 0 failed (localized in-game credit included)
@@ -85,7 +87,7 @@ The focused Edit Mode tests cover:
 - 24 prefab references, shared URP Simple Lit material/colormap, finite bounds, unit roots, no cameras/lights and the 7,000-triangle ceiling;
 - one catalog entry per ID, `Pet` category, `Pet` slot, prefab path and both localization tables.
 
-The 21 Play Mode tests cover selection of every species, follow motion, invalid-asset fallback, save migration, persistence, room placement and photo-context reuse. The .NET suite covers offline save/schema behavior.
+The final review set is 24 Play Mode tests, recorded in `work/task7-green-playmode-final.xml`. It covers selection of every species, follow motion, invalid-asset fallback, save migration, persistence, room placement and photo-context reuse, plus color property blocks, explicitly deferred accessories, and persisted unknown-pet repair. The .NET suite covers offline save/schema behavior.
 
 ## Source and license
 
