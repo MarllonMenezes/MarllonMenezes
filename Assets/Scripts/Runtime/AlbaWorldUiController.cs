@@ -371,13 +371,21 @@ public sealed class AlbaWorldUiController : MonoBehaviour
     {
         _selectionButtons.Clear();
         if (_houseRoot != null)
-            Destroy(_houseRoot);
+            DestroyObject(_houseRoot);
         if (_dressRoot != null)
-            Destroy(_dressRoot);
+            DestroyObject(_dressRoot);
         _houseRoot = null!;
         _dressRoot = null!;
         _petName = null!;
         _notice = null!;
+    }
+
+    private static void DestroyObject(GameObject target)
+    {
+        if (Application.isPlaying)
+            Destroy(target);
+        else
+            DestroyImmediate(target);
     }
 
     private void OnFurnitureSelectionChanged(string _) => SetFurnitureSelection(_furniture.HasSelection);
@@ -425,7 +433,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
             // TMP_Settings is not instantiated in a blank runtime scene.
             text.font = null;
         }
-        if (text.font == null)
+        if (text.font == null && Application.isPlaying)
         {
             var builtinFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
             if (builtinFont != null)

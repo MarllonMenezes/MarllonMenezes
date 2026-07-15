@@ -2,7 +2,8 @@
   "name": "AlbaWorld.Tests",
   "rootNamespace": "AlbaWorld.Tests",
   "references": [
-    "AlbaWorld.Runtime"
+    "AlbaWorld.Runtime",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [
     "Editor"

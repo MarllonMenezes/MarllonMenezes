@@ -20,13 +20,6 @@ namespace AlbaWorld.Runtime;
 [DisallowMultipleComponent]
 public sealed class AlbaWorld3DApp : MonoBehaviour
 {
-    private static readonly Color Ink = new(0.08f, 0.06f, 0.16f, 1f);
-    private static readonly Color Lavender = new(0.36f, 0.26f, 0.58f, 1f);
-    private static readonly Color PanelColor = new(0.06f, 0.07f, 0.13f, 0.88f);
-    private static readonly Color PanelSoft = new(0.12f, 0.13f, 0.22f, 0.92f);
-    private static readonly Color Pink = new(1f, 0.34f, 0.60f, 1f);
-    private static readonly Color Mint = new(0.28f, 0.86f, 0.73f, 1f);
-
     [SerializeField] private GameObject? _girlPrefab;
     [SerializeField] private GameObject? _boyPrefab;
     [SerializeField] private ItemCatalog3D? _petCatalog;
@@ -97,15 +90,13 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 
         camera.backgroundColor = new Color(0.05f, 0.06f, 0.12f, 1f);
         camera.clearFlags = CameraClearFlags.SolidColor;
-        camera.fieldOfView = 35f;
+        camera.fieldOfView = 38f;
         camera.transform.SetPositionAndRotation(new Vector3(0f, 3.4f, -8.5f), Quaternion.identity);
-        camera.transform.LookAt(new Vector3(0f, 1.25f, 0.45f));
+        camera.transform.LookAt(new Vector3(0f, 1.20f, 0.25f));
 
         CreateSurface("Floor", PrimitiveType.Cube, new Vector3(0f, -0.18f, 0.5f), new Vector3(11f, 0.3f, 8f), new Color(0.16f, 0.12f, 0.25f));
         CreateSurface("BackWall", PrimitiveType.Cube, new Vector3(0f, 3.2f, 4.1f), new Vector3(11f, 6.8f, 0.25f), new Color(0.11f, 0.09f, 0.20f));
         CreateSurface("LeftWall", PrimitiveType.Cube, new Vector3(-5.5f, 3.1f, 0.5f), new Vector3(0.25f, 6.6f, 7.2f), new Color(0.20f, 0.13f, 0.29f));
-        CreateSurface("Stage", PrimitiveType.Cylinder, new Vector3(0f, 0.06f, 0.65f), new Vector3(3.7f, 0.12f, 2.7f), new Color(0.97f, 0.39f, 0.64f));
-
         CreateLight("Key Light", new Vector3(-2f, 5.8f, -3f), new Color(1f, 0.73f, 0.83f), 4.8f, 9f);
         CreateLight("Fill Light", new Vector3(3f, 3.6f, 1f), new Color(0.51f, 0.74f, 1f), 3.1f, 7f);
 
@@ -127,7 +118,9 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 
         _character = Instantiate(prefab, _worldRoot, false);
         _character.name = "Character 3D";
-        _character.transform.localPosition = new Vector3(-0.45f, 0.19f, 0.5f);
+        if (IsNewWorldPosition())
+            _save.playerWorld.position = new SerializableVector3(-1f, 0.22f, -0.8f);
+        _character.transform.localPosition = new Vector3(-1f, 0.22f, -0.8f);
         NormalizeHeight(_character, 2.25f);
         _movement = _character.GetComponent<CharacterMovementController>() ?? _character.AddComponent<CharacterMovementController>();
         _movement.Initialize(_character.transform, _save, _saveService, RoomFurnitureController.DefaultWalkableBounds, 0.22f);
@@ -192,7 +185,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 
         var room = _save.rooms3D?.FirstOrDefault(layout =>
             string.Equals(layout.roomId, _save.activeRoomId, StringComparison.Ordinal));
-        if (room != null)
+        if (room?.placements is { Length: > 0 })
             return;
 
         // A small, real-model starter layout makes the first launch immediately readable.
@@ -311,10 +304,10 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 
     private void ChangeRoomStyle()
     {
-        var stage = _worldRoot.Find("Stage")?.GetComponent<Renderer>();
+        var floor = _worldRoot.Find("Floor")?.GetComponent<Renderer>();
         _save.activeRoomId = _save.activeRoomId == "room.sunny" ? "room.cozy" : "room.sunny";
-        if (stage != null)
-            stage.sharedMaterial = CreateMaterial(_save.activeRoomId == "room.sunny" ? new Color(0.97f, 0.39f, 0.64f) : new Color(0.37f, 0.82f, 0.78f));
+        if (floor != null)
+            floor.sharedMaterial = CreateMaterial(_save.activeRoomId == "room.sunny" ? new Color(0.16f, 0.12f, 0.25f) : new Color(0.10f, 0.22f, 0.25f));
         _furniture?.SetRoom(_save.activeRoomId);
         Persist();
         ShowNotice(_language.Get("hud.saved"), true);
@@ -339,6 +332,15 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
     private void ShowNotice(string message, bool success)
     {
         _ui?.ShowNotice(message, success);
+    }
+
+    private bool IsNewWorldPosition()
+    {
+        var position = _save.playerWorld?.position;
+        if (position == null || !Mathf.Approximately(position.x, 0f) || !Mathf.Approximately(position.y, 0f) || !Mathf.Approximately(position.z, 0f))
+            return false;
+        return !(_save.rooms3D ?? Array.Empty<RoomLayoutData>())
+            .Any(room => room?.placements is { Length: > 0 });
     }
 
     private void OnUiModeChanged(AlbaWorldUiMode mode) => _movement?.SetInputEnabled(mode == AlbaWorldUiMode.Casa);
@@ -413,54 +415,6 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         root.transform.localScale *= targetHeight / bounds.size.y;
     }
 
-    private static GameObject Panel(Transform parent, string name, Color color, Vector2 min, Vector2 max)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-        go.transform.SetParent(parent, false);
-        var rect = (RectTransform)go.transform;
-        Anchor(rect, min, max);
-        go.GetComponent<Image>().color = color;
-        return go;
-    }
-
-    private static Text Label(Transform parent, string value, int size, Color color, TextAnchor alignment)
-    {
-        var go = new GameObject("Text", typeof(RectTransform), typeof(Text));
-        go.transform.SetParent(parent, false);
-        var text = go.GetComponent<Text>();
-        text.text = value;
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        text.fontSize = size;
-        text.color = color;
-        text.alignment = alignment;
-        text.horizontalOverflow = HorizontalWrapMode.Overflow;
-        text.verticalOverflow = VerticalWrapMode.Overflow;
-        return text;
-    }
-
-    private static Button AddButton(Transform parent, string value, Color color, Action click, Vector2 min, Vector2 max, int fontSize = 17)
-    {
-        var go = new GameObject("Button", typeof(RectTransform), typeof(Image), typeof(Button));
-        go.transform.SetParent(parent, false);
-        var rect = (RectTransform)go.transform;
-        Anchor(rect, min, max);
-        var image = go.GetComponent<Image>();
-        image.color = color;
-        var button = go.GetComponent<Button>();
-        button.targetGraphic = image;
-        button.onClick.AddListener(() => click());
-        var text = Label(go.transform, value, fontSize, Color.white, TextAnchor.MiddleCenter);
-        Anchor(text.rectTransform, new Vector2(0.03f, 0.02f), new Vector2(0.97f, 0.98f));
-        return button;
-    }
-
-    private static void Anchor(RectTransform rect, Vector2 min, Vector2 max)
-    {
-        rect.anchorMin = min;
-        rect.anchorMax = max;
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-    }
 }
 
 /// <summary>Small deterministic motion used only for the studio presentation.</summary>
