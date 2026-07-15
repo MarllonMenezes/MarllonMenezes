@@ -39,6 +39,40 @@ public sealed class PetAssemblyTests
     }
 
     [UnityTest]
+    public IEnumerator NullPrefabKeepsThePreviousValidInstance()
+    {
+        using var fixture = PetTestFactory.Create();
+        Assert.That(fixture.Controller.TryApply(new PetLoadoutData { petId = "pet.dog" }), Is.True);
+        yield return null;
+        var previous = fixture.Controller.ActiveInstance;
+        fixture.Catalog.GetVisual("pet.dog")!.prefab = null;
+
+        Assert.That(fixture.Controller.TryApply(new PetLoadoutData { petId = "pet.dog" }), Is.False);
+        yield return null;
+
+        Assert.That(fixture.Controller.ActivePetId, Is.EqualTo("pet.dog"));
+        Assert.That(fixture.Controller.ActiveInstance, Is.SameAs(previous));
+    }
+
+    [UnityTest]
+    public IEnumerator SuccessfulReplacementDestroysThePreviousInstanceAndLeavesOneMountChild()
+    {
+        using var fixture = PetTestFactory.Create();
+        Assert.That(fixture.Controller.TryApply(new PetLoadoutData { petId = "pet.dog" }), Is.True);
+        yield return null;
+        var previous = fixture.Controller.ActiveInstance;
+        Assert.That(fixture.Mount.childCount, Is.EqualTo(1));
+
+        Assert.That(fixture.Controller.TryApply(new PetLoadoutData { petId = "pet.cat" }), Is.True);
+        yield return null;
+
+        Assert.That(previous == null, Is.True);
+        Assert.That(fixture.Mount.childCount, Is.EqualTo(1));
+        Assert.That(fixture.Controller.ActivePetId, Is.EqualTo("pet.cat"));
+        Assert.That(fixture.Controller.ActiveInstance, Is.Not.Null);
+    }
+
+    [UnityTest]
     public IEnumerator InvalidFirstPetFallsBackToCat()
     {
         using var fixture = PetTestFactory.Create();

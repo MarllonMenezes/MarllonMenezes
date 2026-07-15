@@ -77,6 +77,7 @@ public static class PetTestFactory
         public PetFollowController Follow { get; }
         public GameObject Target { get; }
         public Transform Mount { get; }
+        public ItemCatalog3D Catalog => _catalog;
 
         public void Dispose()
         {
