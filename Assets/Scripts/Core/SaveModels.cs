@@ -30,7 +30,7 @@ public sealed class GameSaveData
 
 public static class SaveMigration
 {
-    public const int CurrentSchemaVersion = 3;
+    public const int CurrentSchemaVersion = 4;
 
     public static GameSaveData Upgrade(GameSaveData? input)
     {
@@ -76,6 +76,8 @@ public static class SaveMigration
             save.pet.accessoryIds = new[] { save.selectedPetAccessoryId };
         }
 
+        MigrateCharacterPreset(save.character, sourceSchemaVersion);
+
         NormalizeLoadouts(save);
         save.playerWorld.position ??= new SerializableVector3(0f, 0f, 0f);
         save.activeRoomId = DefaultIfBlank(save.activeRoomId, "room.sunny");
@@ -103,6 +105,8 @@ public static class SaveMigration
     private static void NormalizeLoadouts(GameSaveData save)
     {
         save.character.bodyId = DefaultIfBlank(save.character.bodyId, "body.girl");
+        save.character.characterPresetId = DefaultIfBlank(save.character.characterPresetId, "cartooncity.char.01");
+        save.character.presetColorId = DefaultIfBlank(save.character.presetColorId, "default");
         save.character.skinId = DefaultIfBlank(save.character.skinId, "skin.cream");
         save.character.faceId = DefaultIfBlank(save.character.faceId, "face.sunny");
         save.character.hairId = DefaultIfBlank(save.character.hairId, "hair.sunny");
@@ -116,6 +120,22 @@ public static class SaveMigration
 
     private static string DefaultIfBlank(string value, string fallback) =>
         string.IsNullOrWhiteSpace(value) ? fallback : value;
+
+    private static void MigrateCharacterPreset(CharacterLoadoutData character, int sourceSchemaVersion)
+    {
+        if (sourceSchemaVersion < 4)
+        {
+            character.characterPresetId = character.bodyId switch
+            {
+                "body.boy" => "cartooncity.char.02",
+                _ => "cartooncity.char.01"
+            };
+        }
+        else if (string.IsNullOrWhiteSpace(character.characterPresetId))
+        {
+            character.characterPresetId = "cartooncity.char.01";
+        }
+    }
 
     private static bool IsDefaultPetLoadout(PetLoadoutData pet) =>
         (string.IsNullOrWhiteSpace(pet.petId) || string.Equals(pet.petId, "pet.cat", StringComparison.Ordinal)) &&

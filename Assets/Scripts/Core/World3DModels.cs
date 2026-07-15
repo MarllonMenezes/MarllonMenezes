@@ -18,6 +18,8 @@ public sealed class SerializableVector3
 public sealed class CharacterLoadoutData
 {
     public string bodyId = "body.girl";
+    public string characterPresetId = "cartooncity.char.01";
+    public string presetColorId = "default";
     public string skinId = "skin.cream";
     public string faceId = "face.sunny";
     public string hairId = "hair.sunny";
