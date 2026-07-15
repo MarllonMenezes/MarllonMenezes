@@ -17,6 +17,7 @@
     <Compile Include="..\..\Assets\Scripts\Core\World3DModels.cs" Link="World3DModels.cs" />
     <Compile Include="..\..\Assets\Scripts\Core\CatalogRules.cs" Link="CatalogRules.cs" />
     <Compile Include="RewardLimiterTests.cs" />
+    <Compile Include="FirstRunSaveTests.cs" />
     <Compile Include="World3DSaveTests.cs" />
   </ItemGroup>
 </Project>

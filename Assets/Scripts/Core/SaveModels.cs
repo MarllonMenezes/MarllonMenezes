@@ -9,6 +9,7 @@ public sealed class GameSaveData
 {
     public int schemaVersion = SaveMigration.CurrentSchemaVersion;
     public string languageCode = "pt-BR";
+    public bool onboardingCompleted;
     public string selectedSkinId = "skin.cream";
     public string selectedHairId = "hair.sunny";
     public string selectedOutfitId = "outfit.pink";
@@ -30,7 +31,7 @@ public sealed class GameSaveData
 
 public static class SaveMigration
 {
-    public const int CurrentSchemaVersion = 4;
+    public const int CurrentSchemaVersion = 5;
 
     public static GameSaveData Upgrade(GameSaveData? input)
     {
