@@ -76,7 +76,15 @@ public sealed class PetAssemblyController : MonoBehaviour
             return false;
 
         instance.name = requestedId;
-        ApplyHooks(instance, loadout);
+        try
+        {
+            ApplyHooks(instance, loadout);
+        }
+        catch (Exception)
+        {
+            UnityEngine.Object.Destroy(instance);
+            return false;
+        }
 
         // Commit only after Instantiate and hooks have succeeded. The old instance is
         // owned by this controller and is the only object that may be destroyed here.
