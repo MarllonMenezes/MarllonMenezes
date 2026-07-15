@@ -128,6 +128,17 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             _save.playerWorld.position = new SerializableVector3(-1f, 0.22f, -0.8f);
         _character.transform.localPosition = new Vector3(-1f, 0.22f, -0.8f);
         NormalizeHeight(_character, 2.25f);
+        var characterSelectable = _character.GetComponent<WorldSelectable>();
+        if (characterSelectable == null)
+            characterSelectable = _character.AddComponent<WorldSelectable>();
+        characterSelectable.Configure(WorldSelectableKind.Character, "character");
+        var characterCollider = _character.GetComponent<BoxCollider>();
+        if (characterCollider == null)
+        {
+            characterCollider = _character.AddComponent<BoxCollider>();
+            characterCollider.center = new Vector3(0f, 1.05f, 0f);
+            characterCollider.size = new Vector3(0.85f, 2.1f, 0.70f);
+        }
         _movement = _character.GetComponent<CharacterMovementController>() ?? _character.AddComponent<CharacterMovementController>();
         _movement.Initialize(_character.transform, _save, _saveService, RoomFurnitureController.DefaultWalkableBounds, 0.22f);
         if (_characterPresetCatalog != null && preset != null)
@@ -182,6 +193,23 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         follow.FollowSpeed = 2.2f;
         follow.TurnSpeed = 180f;
         follow.FloorHeight = 0.2f;
+        var selectable = instance.GetComponent<WorldSelectable>();
+        if (selectable == null)
+            selectable = instance.AddComponent<WorldSelectable>();
+        selectable.Configure(WorldSelectableKind.Pet, "pet");
+        if (instance.GetComponent<Collider>() == null)
+        {
+            var collider = instance.AddComponent<BoxCollider>();
+            var renderers = instance.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length > 0)
+            {
+                var bounds = renderers[0].bounds;
+                foreach (var renderer in renderers.Skip(1))
+                    bounds.Encapsulate(renderer.bounds);
+                collider.center = instance.transform.InverseTransformPoint(bounds.center);
+                collider.size = bounds.size;
+            }
+        }
         instance.AddComponent<StudioIdleMotion>().Amplitude = 0.025f;
     }
 

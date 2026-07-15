@@ -1,5 +1,4 @@
 using System;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AlbaWorld.Catalog;
@@ -342,6 +341,10 @@ public sealed class RoomFurnitureController : MonoBehaviour
         if (handle == null)
             handle = instance.AddComponent<FurnitureDragHandle>();
         handle.Bind(this, placement.instanceId);
+        var selectable = instance.GetComponent<WorldSelectable>();
+        if (selectable == null)
+            selectable = instance.AddComponent<WorldSelectable>();
+        selectable.Configure(WorldSelectableKind.Furniture, placement.instanceId);
         return instance;
     }
 
@@ -429,6 +432,14 @@ public sealed class RoomFurnitureController : MonoBehaviour
         var id = hit.collider.GetComponentInParent<FurnitureDragHandle>()?.InstanceId;
         if (string.IsNullOrWhiteSpace(id) || !_instances.ContainsKey(id))
             return;
+
+        var selectable = _instances[id].GetComponent<WorldSelectable>();
+        if (selectable != null && !WorldSelectionContext.IsSelected(selectable))
+        {
+            WorldSelectionContext.Select(selectable);
+            SetSelected(id);
+            return;
+        }
 
         if (!TryGetFloorPoint(ray, out var floorPoint))
             return;
@@ -639,7 +650,16 @@ public sealed class RoomFurnitureController : MonoBehaviour
         DestroySelectionMarker();
         SelectedInstanceId = instanceId ?? string.Empty;
         if (!string.IsNullOrWhiteSpace(SelectedInstanceId) && _instances.TryGetValue(SelectedInstanceId, out var instance))
+        {
             _selectionMarker = CreateSelectionMarker(instance);
+            var selectable = instance.GetComponent<WorldSelectable>();
+            if (selectable != null)
+                WorldSelectionContext.Select(selectable);
+        }
+        else if (string.IsNullOrWhiteSpace(SelectedInstanceId) && WorldSelectionContext.Current?.Kind == WorldSelectableKind.Furniture)
+        {
+            WorldSelectionContext.Clear();
+        }
         SelectionChanged?.Invoke(SelectedInstanceId);
     }
 

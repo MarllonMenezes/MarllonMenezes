@@ -144,6 +144,9 @@ public sealed class CharacterMovementController : MonoBehaviour
             return;
 
         var ray = camera.ScreenPointToRay(screenPosition);
+        if (WorldSelectionContext.TryFindSelectable(ray, out _))
+            return;
+
         var plane = new Plane(Vector3.up, new Vector3(0f, _floorY, 0f));
         if (!plane.Raycast(ray, out var distance))
             return;
