@@ -1,6 +1,6 @@
 # Alba World
 
-MVP 2D infantil offline da Alba World Games.
+MVP 3D infantil offline da Alba World Games.
 
 ## Abrir
 
@@ -59,7 +59,13 @@ Para repetir a auditoria focada, execute no diretório do projeto:
 & 'C:\Program Files\dotnet\dotnet.exe' test Tools\CoreTests\AlbaWorld.CoreTests.csproj --no-restore
 ```
 
-Os resultados, a tabela de triângulos e as limitações da captura visual estão em [`docs/testing/kenney-pets-test-report.md`](docs/testing/kenney-pets-test-report.md). A próxima etapa do projeto é rooms/furniture, limitada a conectar o pet existente ao posicionamento e ao modo foto.
+Os resultados, a tabela de triângulos e as limitações da captura visual estão em [`docs/testing/kenney-pets-test-report.md`](docs/testing/kenney-pets-test-report.md). O subsistema atual inclui pets e rooms/furniture; a próxima etapa é polir personagens, roupas e a publicação Android.
+
+## Kenney Furniture Kit (offline)
+
+The project now imports nine real CC0 furniture models from Kenney Furniture Kit 1.0: bed, sofa, table, chair, shelf, lamp, plant, rug, and books. The download is archived on D: at \`D:\AlbaWorldAssets\KenneyFurnitureKit-1.0\`. The project source, license, and manifest are in \`Assets/Art3D/Furniture/Source/KenneyFurnitureKit\` and \`docs/legal/assets/kenney-furniture-kit-1.0\`.
+
+Furniture is selectable from the 3D HUD, draggable within room bounds, scalable, mirrored, reordered, removed, and saved independently for \`room.sunny\` and \`room.cozy\`.
 
 ## AAB
 

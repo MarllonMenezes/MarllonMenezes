@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: furniture.shelf
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
   definition: {fileID: 11400000, guid: 11d72b240367bfc47adafeffbed1cc92, type: 2}
-  prefab: {fileID: 0}
+  prefab: {fileID: 280023928714265307, guid: 6664194c0eea36e409cc6f4d8b82f418, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 0

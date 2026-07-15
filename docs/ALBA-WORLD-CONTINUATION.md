@@ -70,9 +70,17 @@ A inspeção confirmou as 24 espécies visíveis, centralizadas e legendadas nos
 
 As alterações não consolidadas da antiga Tarefa 6 de personagens continuam no worktree (modelos, materiais, prefabs, scripts, testes e imagens). Não fazer limpeza, restauração ou commit amplo delas ao integrar este handoff.
 
-## Próxima etapa: rooms/furniture
+## Próxima etapa: polish and Android release
 
-O próximo subsistema é **rooms/furniture**. Ele pode criar shells de cômodos, móveis e regras de posicionamento, conectar o pet já selecionado ao spawn seguro da casa e preservar a mesma instância no modo foto. Deve continuar offline e não expandir silenciosamente para novos pets, acessórios, animações específicas, multiplayer ou serviços de rede. Antes de qualquer commit dessa etapa, repetir a auditoria de catálogo/persistência e revisar visualmente em 16:9 e 20:9.
+O subsistema rooms/furniture foi implementado no fluxo 3D ativo. A próxima etapa é polir personagens/roupas e concluir a preparação Android, mantendo o projeto offline, bilíngue e sem multiplayer.
+
+## Rooms/furniture concluído
+
+The rooms/furniture slice is now implemented on the active 3D flow. Kenney Furniture Kit 1.0 (CC0) is archived at \`D:\AlbaWorldAssets\KenneyFurnitureKit-1.0\`, with project copies under \`Assets/Art3D/Furniture/Source/KenneyFurnitureKit\` and legal records under \`docs/legal/assets/kenney-furniture-kit-1.0\`. Nine real models are generated as prefabs and linked by the 3D catalog.
+
+The runtime controller keeps separate \`room.sunny\` and \`room.cozy\` layouts in \`GameSaveData.rooms3D\`. Furniture can be added, selected, dragged within bounds, resized, mirrored, reordered, removed, and restored offline. The character, selected Kenney pet, room furniture, and photo capture remain in the same scene.
+
+Focused evidence: \`work/furniture-prefab-green.xml\` (1/1), \`work/furniture-catalog-green.xml\` (1/1), and \`work/rooms-playmode-green.xml\` (2/2).
 
 ## Assets externos
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: furniture.plant
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
   definition: {fileID: 11400000, guid: a6b04014b3ab07a4e8f228fe8650d36a, type: 2}
-  prefab: {fileID: 0}
+  prefab: {fileID: 1035444661511287371, guid: 2491e0b704d3faf4199faee02da8682e, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 0

@@ -1,0 +1,19 @@
+{
+  "package": "Kenney Furniture Kit",
+  "version": "1.0",
+  "license": "CC0",
+  "sourceUrl": "https://kenney.nl/assets/furniture-kit",
+  "sourceRoot": "D:/AlbaWorldAssets/KenneyFurnitureKit-1.0/package",
+  "credit": "Kenney — www.kenney.nl",
+  "items": {
+    "furniture.bed": "bedSingle.fbx",
+    "furniture.sofa": "loungeSofa.fbx",
+    "furniture.table": "table.fbx",
+    "furniture.chair": "chairCushion.fbx",
+    "furniture.shelf": "bookcaseOpen.fbx",
+    "furniture.lamp": "lampRoundFloor.fbx",
+    "furniture.plant": "pottedPlant.fbx",
+    "furniture.rug": "rugRound.fbx",
+    "furniture.book": "books.fbx"
+  }
+}

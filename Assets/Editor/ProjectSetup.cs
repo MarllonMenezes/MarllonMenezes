@@ -45,6 +45,19 @@ public static class ProjectSetup
         ConfigureDirectionalLight(scene);
         ConfigureGlobalVolume(scene);
         EnsureRootObject(scene, "WorldRoot");
+        // Recreate this generated root so old prototype components cannot survive a
+        // regeneration (Unity keeps missing MonoBehaviour slots in the scene YAML).
+        var previousComposition = FindRootObject(scene, "Alba World 3D");
+        if (previousComposition != null)
+            Object.DestroyImmediate(previousComposition);
+        var composition = EnsureRootObject(scene, "Alba World 3D");
+        var app = composition.AddComponent<global::AlbaWorld.Runtime.AlbaWorld3DApp>();
+        var serializedApp = new SerializedObject(app);
+        serializedApp.FindProperty("_girlPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art3D/Characters/Prefabs/BodyGirl.prefab");
+        serializedApp.FindProperty("_boyPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art3D/Characters/Prefabs/BodyBoy.prefab");
+        serializedApp.FindProperty("_petCatalog").objectReferenceValue = AssetDatabase.LoadAssetAtPath<global::AlbaWorld.Catalog.ItemCatalog3D>("Assets/Resources/Data/AlbaItemCatalog3D.asset");
+        serializedApp.FindProperty("_itemCatalog").objectReferenceValue = AssetDatabase.LoadAssetAtPath<global::AlbaWorld.Catalog.ItemCatalog3D>("Assets/Resources/Data/AlbaItemCatalog3D.asset");
+        serializedApp.ApplyModifiedPropertiesWithoutUndo();
 
         EditorSceneManager.SaveScene(scene, ScenePath);
         AssetDatabase.SaveAssets();
@@ -137,8 +150,8 @@ public static class ProjectSetup
     public static void ValidateDemoScene()
     {
         var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-        var app = GameObject.Find("Alba World App");
-        Debug.Log($"Demo scene loaded={scene.IsValid()} app={(app != null)} component={(app != null && app.GetComponent<global::AlbaWorld.AlbaWorldApp>() != null)}");
+        var app = GameObject.Find("Alba World 3D");
+        Debug.Log($"Demo scene loaded={scene.IsValid()} app={(app != null)} component={(app != null && app.GetComponent<global::AlbaWorld.Runtime.AlbaWorld3DApp>() != null)}");
     }
 
     private static void ConfigurePlayer()

@@ -124,6 +124,12 @@ public static class AlbaCatalogBuilder
             if (visual.prefab == null)
                 throw new BuildFailedException($"Missing Kenney pet prefab for {spec.Id}: {KenneyPetAssetSetup.PrefabPathFor(spec.Id)}");
         }
+        else if (KenneyFurnitureAssetSetup.AllIds.Contains(spec.Id, StringComparer.Ordinal))
+        {
+            visual.prefab = AssetDatabase.LoadAssetAtPath<GameObject>(KenneyFurnitureAssetSetup.PrefabPathFor(spec.Id));
+            if (visual.prefab == null)
+                throw new BuildFailedException($"Missing Kenney furniture prefab for {spec.Id}: {KenneyFurnitureAssetSetup.PrefabPathFor(spec.Id)}");
+        }
         ApplyPlacementRules(visual, spec.Id, spec.Category);
         EditorUtility.SetDirty(visual);
         return visual;

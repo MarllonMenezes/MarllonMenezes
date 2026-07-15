@@ -21,6 +21,27 @@ public static class BuildTools
         BuildAndroidPackage(appBundle: false, path: "Builds/AlbaWorld.apk", options: BuildOptions.Development);
     }
 
+    [MenuItem("Alba World/Build Windows Player (local test)")]
+    public static void BuildWindowsPlayer()
+    {
+        ProjectSetup.EnsureDemoScene();
+        // The local Windows test player uses Mono; the installed Unity module does
+        // not include the Windows IL2CPP toolchain yet. Android keeps its IL2CPP
+        // configuration from ProjectSetup.
+        PlayerSettings.SetScriptingBackend(BuildTargetGroup.Standalone, ScriptingImplementation.Mono2x);
+        Directory.CreateDirectory("Builds/AlbaWorldWindows");
+        var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+        {
+            scenes = new[] { "Assets/Scenes/Main.unity" },
+            locationPathName = "Builds/AlbaWorldWindows/AlbaWorld.exe",
+            target = BuildTarget.StandaloneWindows64,
+            options = BuildOptions.Development | BuildOptions.CleanBuildCache
+        });
+        if (report.summary.result != BuildResult.Succeeded)
+            throw new BuildFailedException($"Windows build failed: {report.summary.result}");
+        Debug.Log($"Windows player created at {Path.GetFullPath("Builds/AlbaWorldWindows/AlbaWorld.exe")}");
+    }
+
     private static void BuildAndroidPackage(bool appBundle, string path, BuildOptions options)
     {
         ProjectSetup.EnsureDemoScene();

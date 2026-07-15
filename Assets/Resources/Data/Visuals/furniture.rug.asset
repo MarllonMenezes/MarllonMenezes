@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: furniture.rug
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
   definition: {fileID: 11400000, guid: fe9bebbef2e14424a89c77f6b78e3afd, type: 2}
-  prefab: {fileID: 0}
+  prefab: {fileID: 1843715677184949835, guid: 94d02a39f78e88f4889ecff1021b84d0, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 0

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: furniture.lamp
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
   definition: {fileID: 11400000, guid: 8711a4a26bf111949bfcc3e37610205b, type: 2}
-  prefab: {fileID: 0}
+  prefab: {fileID: 1839779156360646004, guid: 93b5e72f8bfd3564690ad5ba341df299, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 0

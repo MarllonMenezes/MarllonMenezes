@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: furniture.sofa
   m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
   definition: {fileID: 11400000, guid: b94fd3740aa59b64ab2924f5a2746418, type: 2}
-  prefab: {fileID: 0}
+  prefab: {fileID: 384609717984495791, guid: 6add291b2e36182449e7971dc224d626, type: 3}
   girlPrefabOverride: {fileID: 0}
   boyPrefabOverride: {fileID: 0}
   equipmentSlot: 0
