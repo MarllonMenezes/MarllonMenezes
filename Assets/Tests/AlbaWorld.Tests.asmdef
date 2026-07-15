@@ -1,0 +1,24 @@
+{
+  "name": "AlbaWorld.Tests",
+  "rootNamespace": "AlbaWorld.Tests",
+  "references": [
+    "AlbaWorld.Runtime",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

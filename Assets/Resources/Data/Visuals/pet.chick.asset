@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c283ad3d75b150d4abbf3fbab2b97169, type: 3}
+  m_Name: pet.chick
+  m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.ItemVisual3D
+  definition: {fileID: 11400000, guid: 944a531aa4ab47b438ceda1379b06028, type: 2}
+  prefab: {fileID: 1819672145309795918, guid: 73579f921d5228148bbcc6b319be0bac, type: 3}
+  girlPrefabOverride: {fileID: 0}
+  boyPrefabOverride: {fileID: 0}
+  equipmentSlot: 10
+  compatibleBodies: 3
+  placement:
+    kind: 0
+    minimumScale: 0.8
+    maximumScale: 1.2
+    rotationStep: 45
+    canHostSmallObjects: 0

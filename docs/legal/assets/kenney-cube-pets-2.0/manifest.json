@@ -1,0 +1,32 @@
+{
+  "package": "Kenney Cube Pets 2.0",
+  "sourcePath": "outputs/kenney_cube-pets_1.0/Models/FBX format",
+  "license": "CC0",
+  "creditUrl": "https://www.kenney.nl",
+  "animals": [
+    { "id": "pet.beaver", "source": "animal-beaver.fbx" },
+    { "id": "pet.bee", "source": "animal-bee.fbx" },
+    { "id": "pet.bunny", "source": "animal-bunny.fbx" },
+    { "id": "pet.cat", "source": "animal-cat.fbx" },
+    { "id": "pet.caterpillar", "source": "animal-caterpillar.fbx" },
+    { "id": "pet.chick", "source": "animal-chick.fbx" },
+    { "id": "pet.cow", "source": "animal-cow.fbx" },
+    { "id": "pet.crab", "source": "animal-crab.fbx" },
+    { "id": "pet.deer", "source": "animal-deer.fbx" },
+    { "id": "pet.dog", "source": "animal-dog.fbx" },
+    { "id": "pet.elephant", "source": "animal-elephant.fbx" },
+    { "id": "pet.fish", "source": "animal-fish.fbx" },
+    { "id": "pet.fox", "source": "animal-fox.fbx" },
+    { "id": "pet.giraffe", "source": "animal-giraffe.fbx" },
+    { "id": "pet.hog", "source": "animal-hog.fbx" },
+    { "id": "pet.koala", "source": "animal-koala.fbx" },
+    { "id": "pet.lion", "source": "animal-lion.fbx" },
+    { "id": "pet.monkey", "source": "animal-monkey.fbx" },
+    { "id": "pet.panda", "source": "animal-panda.fbx" },
+    { "id": "pet.parrot", "source": "animal-parrot.fbx" },
+    { "id": "pet.penguin", "source": "animal-penguin.fbx" },
+    { "id": "pet.pig", "source": "animal-pig.fbx" },
+    { "id": "pet.polar", "source": "animal-polar.fbx" },
+    { "id": "pet.tiger", "source": "animal-tiger.fbx" }
+  ]
+}

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf24582a62813e469b086ee8686e88e, type: 3}
+  m_Name: CartoonCityChar13
+  m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.CharacterPresetDefinition
+  presetId: cartooncity.char.13
+  displayKey: character.preset.cartooncity.13
+  sourceAsset: Character_B_1.fbx
+  prefab: {fileID: 8048170936921537361, guid: 24945d36a27b0f74f9dbc3dd3da5e143, type: 3}
+  free: 1
+  sortOrder: 13
+  palettes:
+  - paletteId: default
+    displayKey: character.palette.default
+    skinTint: {r: 1, g: 1, b: 1, a: 1}
+    hairTint: {r: 1, g: 1, b: 1, a: 1}
+    outfitTint: {r: 1, g: 1, b: 1, a: 1}
+    shoesTint: {r: 1, g: 1, b: 1, a: 1}
+  - paletteId: pastel
+    displayKey: character.palette.pastel
+    skinTint: {r: 1, g: 1, b: 1, a: 1}
+    hairTint: {r: 1, g: 1, b: 1, a: 1}
+    outfitTint: {r: 1, g: 0.55, b: 0.75, a: 1}
+    shoesTint: {r: 1, g: 1, b: 1, a: 1}
+  compatibleAccessoryIds: []

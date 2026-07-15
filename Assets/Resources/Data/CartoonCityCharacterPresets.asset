@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77930fec5d2fe52449e6c1f0507a5b6d, type: 3}
+  m_Name: CartoonCityCharacterPresets
+  m_EditorClassIdentifier: AlbaWorld.Runtime::AlbaWorld.Catalog.CharacterPresetCatalog
+  presets:
+  - {fileID: 11400000, guid: 4da08316b6420ca4cab18b56d5640748, type: 2}
+  - {fileID: 11400000, guid: a445eb8b21d11fb4ca643c3002b2e93d, type: 2}
+  - {fileID: 11400000, guid: 13180b7352c5eaa4f9f82c70cf547e7c, type: 2}
+  - {fileID: 11400000, guid: 7c81c9e0524c2d64d93c83ead4eff998, type: 2}
+  - {fileID: 11400000, guid: 46d4bcba7facc9a45bc261c787716101, type: 2}
+  - {fileID: 11400000, guid: 04092af5fa02731488d0eae0a3a39212, type: 2}
+  - {fileID: 11400000, guid: 160016061561dd8478c7790369b5aa1e, type: 2}
+  - {fileID: 11400000, guid: 8f8c65bbae42bea4689093fe2b7b22ad, type: 2}
+  - {fileID: 11400000, guid: 83b6afe3c0526e54fbf679764e7b6cc4, type: 2}
+  - {fileID: 11400000, guid: 3133bfbffe6aca54fbe8cc966e4445c5, type: 2}
+  - {fileID: 11400000, guid: af889b36b9e2c2b44bb2d723d2917dae, type: 2}
+  - {fileID: 11400000, guid: b42469dbdea231f459a51cd4baa1e89c, type: 2}
+  - {fileID: 11400000, guid: 4423e6b61391a3f4b9ac0fca86614c49, type: 2}
+  - {fileID: 11400000, guid: c964f8a1efb8932459e976fb72fbe5a6, type: 2}
+  - {fileID: 11400000, guid: 283b863fecc2390499ef622dadb0722d, type: 2}
+  - {fileID: 11400000, guid: d531f81f8dccdc34786c184a26017974, type: 2}

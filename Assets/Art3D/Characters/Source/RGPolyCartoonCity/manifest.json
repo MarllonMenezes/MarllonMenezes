@@ -1,0 +1,34 @@
+{
+  "package": "Cartoon City Massive Pack - Characters (free demo)",
+  "version": "free-demo-2026-07-15",
+  "license": "CC0",
+  "sourceUrl": "https://rg-poly.itch.io/cartoon-city-massive-pack-characters",
+  "sourceRoot": "D:/AlbaWorldAssets/RGPolyCartoonCityCharacters/Characters Free.zip",
+  "downloadFile": "Characters Free.zip",
+  "downloadSha256": "C34B3449AA887E612CE65591F4710308FBAEC14B275154F6B8BC461F86143188",
+  "credit": "RG Poly — https://rg-poly.itch.io",
+  "notes": "Free demo containing 17 Cartoon City characters and animations. Only this free demo is approved for Alba World; the paid Characters Full.zip is not included.",
+  "content": {
+    "format": "Unity FBX",
+    "root": "FBX/Unity FBX",
+    "characters": [
+      "Character_1_2_2.fbx",
+      "Character_2_1_3.fbx",
+      "Character_3_2_3.fbx",
+      "Character_4_1_1.fbx",
+      "Character_5_2_3.fbx",
+      "Character_5_3_1.fbx",
+      "Character_6_2_2.fbx",
+      "Character_8_3_1.fbx",
+      "Character_9_3_4.fbx",
+      "Character_9_5_7.fbx",
+      "Character_10_4_3.fbx",
+      "Character_11_3_1.fbx",
+      "Character_B_1.fbx",
+      "Character_Z_4.fbx",
+      "Character_Z_9.fbx",
+      "PoliceMan_A_4_1.fbx"
+    ],
+    "animations": "Animations/*.fbx"
+  }
+}
