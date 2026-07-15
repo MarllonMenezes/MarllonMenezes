@@ -34,7 +34,7 @@
 - Create: `Assets/Scripts/Pets/PetAssemblyController.cs` — loadout-to-prefab resolution and safe fallback.
 - Create: `Assets/Scripts/Pets/PetFollowController.cs` — target-anchor following without physics.
 - Create: `Assets/Scripts/Pets/KenneyPetIds.cs` — the single ordered list of 24 stable IDs.
-- Create: `Assets/Editor/KenneySourceManifest.cs` — editor-only manifest loader used by source tests.
+- Create: `Assets/Scripts/Pets/KenneySourceManifest.cs` — `#if UNITY_EDITOR` manifest loader used by source tests; it lives beside the shared ID list so the existing test assembly can reference it without changing unrelated asmdefs.
 - Create: `Assets/Editor/MeshMetrics.cs` — editor-only triangle counting helper.
 - Modify: `Assets/Scripts/Core/World3DModels.cs` only if pet runtime state needs an explicit target offset.
 - Modify: `Assets/Scripts/Core/SaveModels.cs` only if migration must normalize the expanded pet IDs.
