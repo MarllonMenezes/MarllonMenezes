@@ -6,7 +6,6 @@ using AlbaWorld.Core;
 using AlbaWorld.Game;
 using AlbaWorld.Runtime;
 using NUnit.Framework;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -55,7 +54,7 @@ public sealed class ResponsiveLayoutContractTests
             Assert.That(rect.anchorMin.y, Is.InRange(0f, 1f), button.name);
             Assert.That(rect.anchorMax.y, Is.InRange(0f, 1f), button.name);
             Assert.That(button.GetComponent<LayoutElement>(), Is.Not.Null, button.name);
-            Assert.That(button.GetComponentInChildren<TMP_Text>(true), Is.Not.Null, button.name);
+            Assert.That(button.GetComponentInChildren<Text>(true), Is.Not.Null, button.name);
         }
     }
 

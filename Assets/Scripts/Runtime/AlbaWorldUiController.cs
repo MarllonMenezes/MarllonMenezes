@@ -1,10 +1,8 @@
 using System;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AlbaWorld.Catalog;
 using AlbaWorld.Game;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -51,10 +49,9 @@ public sealed class AlbaWorldUiController : MonoBehaviour
     private GameObject _safeRoot = null!;
     private GameObject _houseRoot = null!;
     private GameObject _dressRoot = null!;
-    private TMP_Text _petName = null!;
-    private TMP_Text _notice = null!;
+    private Text _petName = null!;
+    private Text _notice = null!;
     private readonly List<Button> _selectionButtons = new();
-    private static TMP_FontAsset? _fallbackFont;
     private string _currentPetName = string.Empty;
     private string _pendingNotice = string.Empty;
     private bool _pendingNoticeSuccess;
@@ -192,13 +189,13 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         Anchor((RectTransform)_houseRoot.transform, Vector2.zero, Vector2.one);
 
         var top = Panel(_houseRoot.transform, "Top Bar", PanelColor, new Vector2(0f, 0.875f), new Vector2(1f, 1f));
-        var title = Label(top.transform, _language.Get("app.title"), 34, Color.white, TextAlignmentOptions.MidlineLeft);
+        var title = Label(top.transform, _language.Get("app.title"), 34, Color.white, TextAnchor.MiddleLeft);
         Anchor(title.rectTransform, new Vector2(0.025f, 0.18f), new Vector2(0.28f, 0.92f));
-        var room = Label(top.transform, _language.Get("hud.house"), 16, new Color(0.72f, 0.73f, 0.84f), TextAlignmentOptions.MidlineLeft);
+        var room = Label(top.transform, _language.Get("hud.house"), 16, new Color(0.72f, 0.73f, 0.84f), TextAnchor.MiddleLeft);
         Anchor(room.rectTransform, new Vector2(0.29f, 0.20f), new Vector2(0.47f, 0.85f));
-        _petName = Label(top.transform, _currentPetName, 16, Mint, TextAlignmentOptions.MidlineLeft);
+        _petName = Label(top.transform, _currentPetName, 16, Mint, TextAnchor.MiddleLeft);
         Anchor(_petName.rectTransform, new Vector2(0.49f, 0.20f), new Vector2(0.64f, 0.85f));
-        var offline = Label(top.transform, _language.Get("hud.offline"), 13, Mint, TextAlignmentOptions.MidlineLeft);
+        var offline = Label(top.transform, _language.Get("hud.offline"), 13, Mint, TextAnchor.MiddleLeft);
         Anchor(offline.rectTransform, new Vector2(0.615f, 0.20f), new Vector2(0.655f, 0.85f));
         AddButton(top.transform, _language.Get("hud.dress"), Pink, EnterDressMode, new Vector2(0.66f, 0.16f), new Vector2(0.78f, 0.86f), 16);
         AddButton(top.transform, _language.Get("hud.photo"), new Color(0.35f, 0.30f, 0.55f), () => _callbacks.Photo?.Invoke(), new Vector2(0.79f, 0.16f), new Vector2(0.89f, 0.86f), 15);
@@ -210,7 +207,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         Anchor((RectTransform)content.transform, new Vector2(0.01f, 0.03f), new Vector2(0.99f, 0.76f));
         AddButton(dock.transform, _language.Get("hud.furniture"), PanelSoft, () => ShowFurniturePage(content.transform), new Vector2(0.02f, 0.80f), new Vector2(0.18f, 0.98f), 15);
         AddButton(dock.transform, _language.Get("hud.actions"), PanelSoft, () => ShowActionsPage(content.transform), new Vector2(0.19f, 0.80f), new Vector2(0.33f, 0.98f), 15);
-        _notice = Label(dock.transform, string.Empty, 15, Mint, TextAlignmentOptions.MidlineRight);
+        _notice = Label(dock.transform, string.Empty, 15, Mint, TextAnchor.MiddleRight);
         Anchor(_notice.rectTransform, new Vector2(0.35f, 0.80f), new Vector2(0.98f, 0.98f));
         ShowFurniturePage(content.transform);
     }
@@ -222,13 +219,13 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         Anchor((RectTransform)_dressRoot.transform, Vector2.zero, Vector2.one);
 
         var preview = Panel(_dressRoot.transform, "Character Preview", PanelColor, new Vector2(0f, 0.08f), new Vector2(0.47f, 0.85f));
-        var previewTitle = Label(preview.transform, _language.Get("wardrobe.preview"), 22, Color.white, TextAlignmentOptions.Center);
+        var previewTitle = Label(preview.transform, _language.Get("wardrobe.preview"), 22, Color.white, TextAnchor.MiddleCenter);
         Anchor(previewTitle.rectTransform, new Vector2(0.08f, 0.88f), new Vector2(0.92f, 0.98f));
-        var hint = Label(preview.transform, _language.Get("wardrobe.choose"), 16, new Color(0.72f, 0.73f, 0.84f), TextAlignmentOptions.Center);
+        var hint = Label(preview.transform, _language.Get("wardrobe.choose"), 16, new Color(0.72f, 0.73f, 0.84f), TextAnchor.MiddleCenter);
         Anchor(hint.rectTransform, new Vector2(0.08f, 0.04f), new Vector2(0.92f, 0.16f));
 
         var panel = Panel(_dressRoot.transform, "Wardrobe Panel", PanelColor, new Vector2(0.50f, 0.08f), new Vector2(1f, 0.85f));
-        var heading = Label(panel.transform, _language.Get("hud.dress"), 26, Color.white, TextAlignmentOptions.MidlineLeft);
+        var heading = Label(panel.transform, _language.Get("hud.dress"), 26, Color.white, TextAnchor.MiddleLeft);
         Anchor(heading.rectTransform, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.98f));
         var categories = new[]
         {
@@ -418,33 +415,21 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         return go;
     }
 
-    private static TMP_Text Label(Transform parent, string value, float size, Color color, TextAlignmentOptions alignment)
+    private static Text Label(Transform parent, string value, float size, Color color, TextAnchor alignment)
     {
-        var go = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+        var go = new GameObject("Text", typeof(RectTransform), typeof(Text));
         go.transform.SetParent(parent, false);
-        var text = go.GetComponent<TextMeshProUGUI>();
+        var text = go.GetComponent<Text>();
         text.text = value;
-        try
-        {
-            text.font = TMP_Settings.defaultFontAsset;
-        }
-        catch (NullReferenceException)
-        {
-            // TMP_Settings is not instantiated in a blank runtime scene.
-            text.font = null;
-        }
-        if (text.font == null && Application.isPlaying)
-        {
-            var builtinFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-            if (builtinFont != null)
-                _fallbackFont ??= TMP_FontAsset.CreateFontAsset(builtinFont);
-            text.font = _fallbackFont;
-        }
-        text.fontSize = size;
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.fontSize = Mathf.RoundToInt(size);
         text.color = color;
         text.alignment = alignment;
-        text.enableWordWrapping = true;
-        text.overflowMode = TextOverflowModes.Ellipsis;
+        text.horizontalOverflow = HorizontalWrapMode.Wrap;
+        text.verticalOverflow = VerticalWrapMode.Truncate;
+        text.resizeTextForBestFit = true;
+        text.resizeTextMinSize = Mathf.Max(10, Mathf.RoundToInt(size * 0.65f));
+        text.resizeTextMaxSize = Mathf.RoundToInt(size);
         text.raycastTarget = false;
         return text;
     }
@@ -462,7 +447,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         var button = go.GetComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => click());
-        var text = Label(go.transform, value, fontSize, Color.white, TextAlignmentOptions.Center);
+        var text = Label(go.transform, value, fontSize, Color.white, TextAnchor.MiddleCenter);
         Anchor(text.rectTransform, new Vector2(0.04f, 0.04f), new Vector2(0.96f, 0.96f));
         return button;
     }
