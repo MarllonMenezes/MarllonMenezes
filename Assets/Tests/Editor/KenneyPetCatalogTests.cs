@@ -5,6 +5,7 @@ using AlbaWorld.Catalog;
 using AlbaWorld.Editor;
 using AlbaWorld.Game;
 using AlbaWorld.Pets;
+using AlbaWorld.Runtime;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.Build;
@@ -14,6 +15,18 @@ namespace AlbaWorld.Tests;
 
 public sealed class KenneyPetCatalogTests
 {
+    [Test]
+    public void KenneyCreditIsLocalizedInPortugueseAndEnglish()
+    {
+        Assert.That(LocalizationTestData.Has("pt-BR", "credits.kenney"), Is.True);
+        Assert.That(LocalizationTestData.Has("en", "credits.kenney"), Is.True);
+
+        var portuguese = new LanguageService("pt-BR");
+        var english = new LanguageService("en");
+        Assert.That(portuguese.Get("credits.kenney"), Does.Contain("Kenney").And.Contain("www.kenney.nl"));
+        Assert.That(english.Get("credits.kenney"), Does.Contain("Kenney").And.Contain("www.kenney.nl"));
+    }
+
     [Test]
     public void CatalogContainsEveryKenneyPetWithBothTranslations()
     {

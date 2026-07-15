@@ -20,6 +20,8 @@ O pacote local Kenney Cube Pets 2.0 foi copiado sem criação de arte nova. Os 2
 
 Os prefabs usam a textura compartilhada e o material URP Simple Lit em `Assets/Art3D/Pets`. O assembly runtime seleciona e substitui pets com fallback seguro para `pet.cat`; o follow controller, save/schema 3, casa e modo foto reutilizam a instância selecionada. Nenhum desses fluxos depende de rede, pacote runtime ou importador em execução.
 
+O painel de configurações exibe o crédito localizado `Kenney — www.kenney.nl` em `pt-BR` e `en`. `PetLoadoutData.colorId` é consumido no visual 3D por `MaterialPropertyBlock`, sem duplicar materiais (`petcolor.sunny` identidade; `petcolor.cocoa` marrom quente). `accessoryIds` permanecem persistidos e enviados aos hooks, mas a renderização 3D está explicitamente adiada até a aprovação de assets compatíveis. Se um ID de pet desconhecido for restaurado, o fallback `pet.cat` é salvo uma vez; a recarga não repete o ID inválido.
+
 Origem e licença:
 
 - Fonte e manifesto: `Assets/Art3D/Pets/Source/KenneyCubePets`

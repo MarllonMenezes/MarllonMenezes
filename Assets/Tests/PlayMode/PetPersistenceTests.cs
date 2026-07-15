@@ -96,7 +96,7 @@ public sealed class PetPersistenceTests
         Assert.That(flow.ActivePetRoot, Is.Not.Null);
         Assert.That(save.pet.petId, Is.EqualTo("pet.cat"));
         Assert.That(save.selectedPetId, Is.EqualTo("pet.cat"));
-        Assert.That(service.SaveCount, Is.Zero);
+        Assert.That(service.SaveCount, Is.EqualTo(1));
     }
 
     [UnityTest]
@@ -119,6 +119,36 @@ public sealed class PetPersistenceTests
         Assert.That(fixture.Controller.ActivePetId, Is.EqualTo("pet.cat"));
         Assert.That(save.pet.petId, Is.EqualTo("pet.cat"));
         Assert.That(save.selectedPetId, Is.EqualTo("pet.cat"));
+        Assert.That(service.SaveCount, Is.EqualTo(1));
+    }
+
+    [UnityTest]
+    public IEnumerator UnknownPetRepairIsSavedAndReloadsWithoutRepeatingTheInvalidId()
+    {
+        using var fixture = PetTestFactory.Create();
+        var initial = new GameSaveData
+        {
+            selectedPetId = "pet.missing",
+            pet = new PetLoadoutData { petId = "pet.missing" }
+        };
+        var service = new JsonRecordingSaveService();
+        var flow = new PetPersistenceCoordinator(initial, service, fixture.Controller);
+
+        Assert.That(flow.Restore(), Is.True);
+        yield return null;
+
+        Assert.That(service.SaveCount, Is.EqualTo(1));
+        Assert.That(service.Json, Does.Not.Contain("pet.missing"));
+        var reloaded = service.Load();
+        Assert.That(reloaded.pet.petId, Is.EqualTo("pet.cat"));
+        Assert.That(reloaded.selectedPetId, Is.EqualTo("pet.cat"));
+
+        service.Reset();
+        using var secondFixture = PetTestFactory.Create();
+        var secondFlow = new PetPersistenceCoordinator(reloaded, service, secondFixture.Controller);
+        Assert.That(secondFlow.Restore(), Is.True);
+        yield return null;
+        Assert.That(secondFixture.Controller.ActivePetId, Is.EqualTo("pet.cat"));
         Assert.That(service.SaveCount, Is.Zero);
     }
 
@@ -159,6 +189,24 @@ public sealed class PetPersistenceTests
         public GameSaveData Load() => throw new NotSupportedException();
 
         public void Save(GameSaveData data) => SaveCount++;
+
+        public void Reset() => SaveCount = 0;
+    }
+
+    private sealed class JsonRecordingSaveService : ISaveService
+    {
+        public int SaveCount { get; private set; }
+        public string Json { get; private set; } = string.Empty;
+
+        public GameSaveData Load() => string.IsNullOrWhiteSpace(Json)
+            ? new GameSaveData()
+            : JsonUtility.FromJson<GameSaveData>(Json);
+
+        public void Save(GameSaveData data)
+        {
+            SaveCount++;
+            Json = JsonUtility.ToJson(data, prettyPrint: true);
+        }
 
         public void Reset() => SaveCount = 0;
     }

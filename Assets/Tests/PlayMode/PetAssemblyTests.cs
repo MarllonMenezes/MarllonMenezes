@@ -24,6 +24,45 @@ public sealed class PetAssemblyTests
     }
 
     [UnityTest]
+    public IEnumerator PetColorLoadoutUsesAPropertyBlockMultiplierWithoutDuplicatingMaterials()
+    {
+        using var fixture = PetTestFactory.Create();
+        Assert.That(fixture.Controller.TryApply(new PetLoadoutData
+        {
+            petId = "pet.dog",
+            colorId = "petcolor.cocoa"
+        }), Is.True);
+        yield return null;
+
+        var renderer = fixture.Controller.ActiveInstance!.GetComponentInChildren<Renderer>(true);
+        Assert.That(renderer, Is.Not.Null);
+        var properties = new MaterialPropertyBlock();
+        renderer!.GetPropertyBlock(properties);
+        var color = properties.GetColor(Shader.PropertyToID("_BaseColor"));
+        Assert.That(color.r, Is.EqualTo(0.72f).Within(0.001f));
+        Assert.That(color.g, Is.EqualTo(0.46f).Within(0.001f));
+        Assert.That(color.b, Is.EqualTo(0.28f).Within(0.001f));
+        Assert.That(color.a, Is.EqualTo(1f).Within(0.001f));
+    }
+
+    [UnityTest]
+    public IEnumerator PetAccessoriesRemainPersistedButRenderingIsExplicitlyDeferred()
+    {
+        using var fixture = PetTestFactory.Create();
+        Assert.That(fixture.Controller.TryApply(new PetLoadoutData
+        {
+            petId = "pet.cat",
+            accessoryIds = new[] { "pet.bow" }
+        }), Is.True);
+        yield return null;
+
+        var status = typeof(PetAssemblyController).GetProperty("AccessoryRenderingDeferred");
+        Assert.That(status, Is.Not.Null);
+        Assert.That(status!.GetValue(null), Is.EqualTo(true));
+        Assert.That(fixture.Controller.ActiveInstance!.transform.Find("pet.bow"), Is.Null);
+    }
+
+    [UnityTest]
     public IEnumerator InvalidPetKeepsThePreviousValidInstance()
     {
         using var fixture = PetTestFactory.Create();

@@ -59,6 +59,26 @@ Commands were run from the project root. Unity commands intentionally omit `-qui
 
 Triangle counts were emitted by a temporary editor-only audit test and saved at `work/task6-kenney-triangles.xml` (1/1 passed); the helper and its `.meta` file were removed after the audit. The focused test XML and logs above are ignored build evidence and are not product assets.
 
+## Correção final do review (15/07/2026)
+
+The final review follow-up was verified with fresh commands after the implementation:
+
+```powershell
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneyPetCatalogTests -testResults work/task7-green-credit-final.xml -logFile work/task7-green-credit-final.log
+# result: Passed, 3 total, 3 passed, 0 failed (localized in-game credit included)
+
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform playmode -testResults work/task7-green-playmode-final.xml -logFile work/task7-green-playmode-final.log
+# result: Passed, 24 total, 24 passed, 0 failed (color block, deferred accessories and fallback-save coverage)
+
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -quit -nographics -projectPath . -executeMethod AlbaWorld.Editor.BuildTools.BuildAndroidApk -logFile work/task7-android-apk.log
+# result: blocked; AndroidPlayerBuildProgram repeatedly exited 4 while com.unity.burst/.Runtime\\bcl.exe ran; no APK was produced
+
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\platform-tools\adb.exe' devices
+# result: daemon started, no devices/emulators listed; install/offline smoke test could not run
+```
+
+`PetLoadoutData.colorId` now applies a shared-material color multiplier through renderer property blocks (`petcolor.sunny` identity and `petcolor.cocoa` warm brown), without duplicating materials. `accessoryIds` remain persisted and broadcast to hooks, but 3D accessory rendering is explicitly deferred until approved assets exist; no placeholder geometry or new art is added. If restore encounters an unknown pet ID, it instantiates `pet.cat`, saves the repaired JSON once, and a save/reload test confirms the invalid ID is not repeated.
+
 The focused Edit Mode tests cover:
 
 - 24 manifest entries, unique IDs, safe local source paths and CC0 metadata;

@@ -53,6 +53,8 @@ Cada entrada terá categoria `Pet`, slot `Pet`, prefab obrigatório, regra de es
 
 ## Arquitetura de runtime
 
+The approved runtime behavior is now explicit: `PetLoadoutData.colorId` is applied as a renderer `MaterialPropertyBlock` multiplier (`petcolor.sunny` identity, `petcolor.cocoa` warm brown), preserving shared materials without duplication. `accessoryIds` remain persisted and broadcast for forward compatibility, but 3D accessory rendering is deferred until approved accessory assets are available; no placeholder geometry is part of this scope.
+
 Será criado um assembly visual de pet que recebe `PetLoadoutData` e resolve o prefab pelo `IItemCatalog3D`. O componente deve:
 
 1. remover o visual anterior;

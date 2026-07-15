@@ -380,6 +380,8 @@ public sealed class AlbaWorldApp : MonoBehaviour
         var ptRect = (RectTransform)pt.transform; ptRect.anchorMin = new Vector2(0.08f, 0.35f); ptRect.anchorMax = new Vector2(0.46f, 0.62f); ptRect.offsetMin = Vector2.zero; ptRect.offsetMax = Vector2.zero;
         var en = UiFactory.Button(panel, _language.Get("language.en"), _language.Current == AlbaLanguage.English ? UiFactory.Pink : Color.white, () => ChangeLanguage("en"));
         var enRect = (RectTransform)en.transform; enRect.anchorMin = new Vector2(0.54f, 0.35f); enRect.anchorMax = new Vector2(0.92f, 0.62f); enRect.offsetMin = Vector2.zero; enRect.offsetMax = Vector2.zero;
+        var credit = UiFactory.Label(panel, _language.Get("credits.kenney"), 16, new Color(0.42f, 0.38f, 0.52f));
+        var creditRect = (RectTransform)credit.transform; creditRect.anchorMin = new Vector2(0.08f, 0.08f); creditRect.anchorMax = new Vector2(0.92f, 0.24f); creditRect.offsetMin = Vector2.zero; creditRect.offsetMax = Vector2.zero;
     }
 
     private void ChangeLanguage(string code)
@@ -437,12 +439,13 @@ public sealed class PetPersistenceCoordinator
     }
 
     /// <summary>
-    /// Restores the saved loadout. A missing first pet is safely instantiated as the cat;
-    /// the in-memory save is repaired without writing until a successful selection/save.
+    /// Restores the saved loadout. An unknown pet ID is safely replaced with the cat and
+    /// the repaired loadout is persisted once so the invalid ID is not written again.
     /// </summary>
     public bool Restore()
     {
         SaveMigration.Upgrade(_save);
+        var requestedPetWasUnknown = !_assembly.HasUsablePet(_save.pet.petId);
         var applied = _assembly.TryApply(_save.pet);
         if (applied)
         {
@@ -460,6 +463,7 @@ public sealed class PetPersistenceCoordinator
         if (fallbackApplied && _assembly.ActiveInstance != null && _assembly.ActivePetId == DefaultPetId)
         {
             SetPetId(DefaultPetId);
+            PersistRepairIfNeeded(requestedPetWasUnknown);
             return true;
         }
 
@@ -468,7 +472,10 @@ public sealed class PetPersistenceCoordinator
         if (_assembly.ActiveInstance != null)
             MirrorActivePetId();
         else
+        {
             SetPetId(DefaultPetId);
+            PersistRepairIfNeeded(requestedPetWasUnknown);
+        }
         return false;
     }
 
@@ -515,6 +522,12 @@ public sealed class PetPersistenceCoordinator
     {
         _save.pet.petId = petId;
         _save.selectedPetId = petId;
+    }
+
+    private void PersistRepairIfNeeded(bool requestedPetWasUnknown)
+    {
+        if (requestedPetWasUnknown)
+            _saveService.Save(_save);
     }
 
     private static PetLoadoutData CloneLoadout(PetLoadoutData source)

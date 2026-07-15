@@ -45,6 +45,8 @@ Os testes Unity ficam em `Assets/Tests/Editor`. O teste automatizado usado nesta
 
 ### Pets Kenney (offline)
 
+The in-game settings panel also shows the localized `Kenney — www.kenney.nl` credit in `pt-BR` and `en`. `PetLoadoutData.colorId` is consumed in the 3D visual through a `MaterialPropertyBlock` (`petcolor.sunny` identity and `petcolor.cocoa` warm brown), preserving shared materials without duplication. `accessoryIds` remain persisted and broadcast to hooks, but 3D rendering is explicitly deferred until compatible assets are approved; no placeholder or new art is created. When restoring an unknown pet ID, the flow saves the `pet.cat` fallback once; a subsequent reload does not repeat the invalid ID or save again.
+
 O subsistema de pets inclui os 24 prefabs locais do Kenney Cube Pets 2.0. `pet.cat` e `pet.dog` continuam sendo os IDs legados; todos os animais usam o catálogo 3D, localização bilíngue, persistência local e os fluxos de casa/foto sem exigir internet. A fonte e a licença Creative Commons Zero ficam arquivadas em `Assets/Art3D/Pets/Source/KenneyCubePets` e `docs/legal/assets/kenney-cube-pets-2.0` (crédito recomendado: **Kenney — www.kenney.nl**).
 
 Para repetir a auditoria focada, execute no diretório do projeto:
@@ -72,6 +74,8 @@ Com um aparelho conectado e a depuração USB autorizada:
 ```powershell
 & 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\platform-tools\adb.exe' install -r Builds\AlbaWorld.apk
 ```
+
+Android acceptance run on 2026-07-15: the development APK build command started, but the Android pipeline repeatedly ran `AndroidPlayerBuildProgram` with `ExitCode: 4` in `com.unity.burst/.Runtime\\bcl.exe`; no `Builds/AlbaWorld.apk` was produced. `adb devices` started the daemon and returned an empty list, so no device/emulator was available for installation or offline smoke testing. Full log: `work/task7-android-apk.log`.
 
 ## Instalação usada nesta máquina
 
