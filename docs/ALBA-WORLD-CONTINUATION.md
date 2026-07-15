@@ -84,6 +84,19 @@ Focused evidence: \`work/furniture-prefab-green.xml\` (1/1), \`work/furniture-ca
 
 ## Assets externos
 
+## Atualização: fluxo de primeira execução do MVP
+
+Em 15/07/2026 foi implementado o marco de primeira execução aprovado pelo usuário:
+
+- `GameSaveData.onboardingCompleted` e migração idempotente para schema 5;
+- Welcome com título, instruções de seleção/arraste/modos, botão Jogar e troca de idioma;
+- Casa só habilita movimento depois de sair da Welcome;
+- cômodo atual visível na barra superior, com nomes localizados para `room.sunny` e `room.cozy`;
+- troca de idioma reconstrói Welcome, Casa ou Vestir sem perder o estado;
+- build Windows local regenerado em `Builds/AlbaWorldWindows/AlbaWorld.exe`.
+
+Evidência reproduzível: [`docs/testing/first-run-mvp-test-report.md`](testing/first-run-mvp-test-report.md).
+
 ## Atualização: Casa, Vestir e sala jogável
 
 Esta atualização substitui a antiga HUD sobreposta por dois modos claros no mesmo cenário:
