@@ -22,6 +22,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 {
     [SerializeField] private GameObject? _girlPrefab;
     [SerializeField] private GameObject? _boyPrefab;
+    [SerializeField] private CharacterPresetCatalog? _characterPresetCatalog;
     [SerializeField] private ItemCatalog3D? _petCatalog;
     [SerializeField] private ItemCatalog3D? _itemCatalog;
 
@@ -38,6 +39,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
     private AlbaWorldUiController _ui = null!;
     private CharacterMovementController _movement = null!;
     private CharacterWardrobeController _wardrobe = null!;
+    private CharacterPresetController _presetController = null!;
     private GameObject _hud = null!;
     private bool _started;
 
@@ -55,6 +57,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         _photo = new PhotoExporter();
         _petCatalog ??= Resources.Load<ItemCatalog3D>("Data/AlbaItemCatalog3D");
         _itemCatalog ??= Resources.Load<ItemCatalog3D>("Data/AlbaItemCatalog3D");
+        _characterPresetCatalog ??= Resources.Load<CharacterPresetCatalog>("Data/CartoonCityCharacterPresets");
         _girlPrefab ??= Resources.Load<GameObject>("Characters/BodyGirl");
         _boyPrefab ??= Resources.Load<GameObject>("Characters/BodyBoy");
 
@@ -107,7 +110,10 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 
     private void CreateCharacter()
     {
-        var prefab = _save.character.bodyId == "body.boy" ? _boyPrefab : _girlPrefab;
+        var preset = _characterPresetCatalog?.Get(_save.character.characterPresetId);
+        var prefab = preset?.prefab;
+        if (prefab == null)
+            prefab = _save.character.bodyId == "body.boy" ? _boyPrefab : _girlPrefab;
         prefab ??= _girlPrefab ?? _boyPrefab;
         if (prefab == null)
         {
@@ -124,12 +130,21 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         NormalizeHeight(_character, 2.25f);
         _movement = _character.GetComponent<CharacterMovementController>() ?? _character.AddComponent<CharacterMovementController>();
         _movement.Initialize(_character.transform, _save, _saveService, RoomFurnitureController.DefaultWalkableBounds, 0.22f);
+        if (_characterPresetCatalog != null && preset != null)
+        {
+            _presetController = _character.GetComponent<CharacterPresetController>();
+            if (_presetController == null)
+                _presetController = _character.AddComponent<CharacterPresetController>();
+            _presetController.Initialize(_characterPresetCatalog, _character.transform, _save, _saveService);
+        }
         if (_ui != null)
             _movement.SetInputEnabled(_ui.Mode == AlbaWorldUiMode.Casa);
         if (_itemCatalog != null)
         {
             _wardrobe = _character.GetComponent<CharacterWardrobeController>() ?? _character.AddComponent<CharacterWardrobeController>();
             _wardrobe.Initialize(_itemCatalog, _character.transform, _save, _saveService);
+            if (_presetController != null)
+                _wardrobe.AttachPresetController(_presetController);
         }
     }
 
@@ -217,9 +232,11 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             ChangeRoomStyle,
             ToggleLanguage,
             SelectPet,
-            () => { });
+            () => { },
+            SelectCharacterPreset);
         _ui.SetPetName(_language.Get("item." + _save.pet.petId));
         _ui.AttachWardrobe(_wardrobe);
+        _ui.AttachCharacterPresets(_presetController);
         _movement?.SetInputEnabled(_ui.Mode == AlbaWorldUiMode.Casa);
     }
 
@@ -291,12 +308,45 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
 
     private void SwitchCharacter()
     {
-        _save.character.bodyId = _save.character.bodyId == "body.boy" ? "body.girl" : "body.boy";
+        var presets = _characterPresetCatalog?.All.OrderBy(preset => preset.sortOrder).ToArray() ?? Array.Empty<CharacterPresetDefinition>();
+        if (presets.Length > 1)
+        {
+            var currentIndex = Array.FindIndex(presets, preset => preset.presetId == _save.character.characterPresetId);
+            var next = presets[(currentIndex + 1 + presets.Length) % presets.Length];
+            _save.character.characterPresetId = next.presetId;
+            _save.character.bodyId = next.presetId.EndsWith(".02", StringComparison.Ordinal) ? "body.boy" : "body.girl";
+        }
+        else
+        {
+            _save.character.bodyId = _save.character.bodyId == "body.boy" ? "body.girl" : "body.boy";
+        }
         if (_character != null)
             Destroy(_character);
         _movement = null!;
+        _presetController = null!;
         CreateCharacter();
         _ui?.AttachWardrobe(_wardrobe);
+        _ui?.AttachCharacterPresets(_presetController);
+        SetupPetFollow(_petAssembly?.ActiveInstance);
+        Persist();
+        ShowNotice(_language.Get("hud.saved"), true);
+    }
+
+    private void SelectCharacterPreset(string presetId)
+    {
+        if (_presetController == null || !_presetController.TrySelect(presetId))
+        {
+            ShowNotice(_language.Get("photo.error"), false);
+            return;
+        }
+
+        if (_character != null)
+            Destroy(_character);
+        _movement = null!;
+        _presetController = null!;
+        CreateCharacter();
+        _ui?.AttachWardrobe(_wardrobe);
+        _ui?.AttachCharacterPresets(_presetController);
         SetupPetFollow(_petAssembly?.ActiveInstance);
         Persist();
         ShowNotice(_language.Get("hud.saved"), true);

@@ -3,35 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace AlbaWorld.Catalog;
-
-public interface ICharacterPresetCatalog
+namespace AlbaWorld.Catalog
 {
-    CharacterPresetDefinition? Get(string id);
-    IEnumerable<CharacterPresetDefinition> All { get; }
-}
-
-[CreateAssetMenu(menuName = "Alba World/Character Preset Catalog", fileName = "CharacterPresetCatalog")]
-public sealed class CharacterPresetCatalog : ScriptableObject, ICharacterPresetCatalog
-{
-    public List<CharacterPresetDefinition> presets = new();
-
-    [NonSerialized] private Dictionary<string, CharacterPresetDefinition>? _byId;
-    [NonSerialized] private int _sourceSignature;
-
-    public IEnumerable<CharacterPresetDefinition> All => presets.Where(preset => preset != null);
-
-    public CharacterPresetDefinition? Get(string id)
+    [CreateAssetMenu(menuName = "Alba World/Character Preset Catalog", fileName = "CharacterPresetCatalog")]
+    public sealed class CharacterPresetCatalog : ScriptableObject, ICharacterPresetCatalog
     {
-        EnsureLookup();
-        return id != null && _byId!.TryGetValue(id, out var preset) ? preset : null;
-    }
+        public List<CharacterPresetDefinition> presets = new();
 
-    private void OnEnable() => _byId = null;
-    private void OnValidate() => _byId = null;
+        [NonSerialized] private Dictionary<string, CharacterPresetDefinition>? _byId;
+        [NonSerialized] private int _sourceSignature;
 
-    private void EnsureLookup()
-    {
+        public IEnumerable<CharacterPresetDefinition> All => presets.Where(preset => preset != null);
+
+        public CharacterPresetDefinition? Get(string id)
+        {
+            EnsureLookup();
+            return id != null && _byId!.TryGetValue(id, out var preset) ? preset : null;
+        }
+
+        private void OnEnable() => _byId = null;
+        private void OnValidate() => _byId = null;
+
+        private void EnsureLookup()
+        {
         var signature = ComputeSourceSignature();
         if (_byId != null && signature == _sourceSignature)
             return;
@@ -46,10 +40,10 @@ public sealed class CharacterPresetCatalog : ScriptableObject, ICharacterPresetC
 
         _byId = rebuilt;
         _sourceSignature = signature;
-    }
+        }
 
-    private int ComputeSourceSignature()
-    {
+        private int ComputeSourceSignature()
+        {
         unchecked
         {
             var signature = presets.Count;
@@ -61,15 +55,16 @@ public sealed class CharacterPresetCatalog : ScriptableObject, ICharacterPresetC
 
             return signature;
         }
-    }
+        }
 
-#if UNITY_EDITOR
-    public static CharacterPresetCatalog TestOnly(params string[] ids)
-    {
-        var catalog = CreateInstance<CharacterPresetCatalog>();
-        foreach (var id in ids ?? Array.Empty<string>())
-            catalog.presets.Add(CharacterPresetDefinition.TestOnly(id));
-        return catalog;
+    #if UNITY_EDITOR
+        public static CharacterPresetCatalog TestOnly(params string[] ids)
+        {
+            var catalog = CreateInstance<CharacterPresetCatalog>();
+            foreach (var id in ids ?? Array.Empty<string>())
+                catalog.presets.Add(CharacterPresetDefinition.TestOnly(id));
+            return catalog;
+        }
+    #endif
     }
-#endif
 }

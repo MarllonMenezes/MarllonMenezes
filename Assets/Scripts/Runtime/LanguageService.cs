@@ -69,7 +69,20 @@ public sealed class LanguageService
     public AlbaLanguage Current { get; private set; }
     public event Action? Changed;
 
-    public LanguageService(string code = "pt-BR") => Set(code);
+    public LanguageService(string code = "pt-BR")
+    {
+        _pt["wardrobe.palette"] = "Cores";
+        _en["wardrobe.palette"] = "Colors";
+        _pt["character.palette.default"] = "Original";
+        _en["character.palette.default"] = "Original";
+        _pt["character.palette.pastel"] = "Pastel";
+        _en["character.palette.pastel"] = "Pastel";
+        _pt["character.preset.cartooncity.01"] = "Alba 1";
+        _en["character.preset.cartooncity.01"] = "Alba 1";
+        _pt["character.preset.cartooncity.02"] = "Alba 2";
+        _en["character.preset.cartooncity.02"] = "Alba 2";
+        Set(code);
+    }
 
     public void Set(string code)
     {

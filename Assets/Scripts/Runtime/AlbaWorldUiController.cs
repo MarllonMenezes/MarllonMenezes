@@ -40,11 +40,13 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         public Action? Language;
         public Action<string>? SelectPet;
         public Action? EnterDress;
+        public Action<string>? SelectCharacterPreset;
     }
 
     private LanguageService _language = null!;
     private RoomFurnitureController _furniture = null!;
     private CharacterWardrobeController? _wardrobe;
+    private CharacterPresetController? _presetController;
     private Callbacks _callbacks = new();
     private GameObject _safeRoot = null!;
     private GameObject _houseRoot = null!;
@@ -68,6 +70,11 @@ public sealed class AlbaWorldUiController : MonoBehaviour
             _wardrobe.NoticeRequested += OnWardrobeNotice;
     }
 
+    public void AttachCharacterPresets(CharacterPresetController controller)
+    {
+        _presetController = controller;
+    }
+
     public void Initialize(
         LanguageService language,
         RoomFurnitureController furniture,
@@ -83,7 +90,8 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         Action room,
         Action languageToggle,
         Action<string> selectPet,
-        Action enterDress)
+        Action enterDress,
+        Action<string>? selectCharacterPreset = null)
     {
         _language = language ?? throw new ArgumentNullException(nameof(language));
         _furniture = furniture ?? throw new ArgumentNullException(nameof(furniture));
@@ -101,7 +109,8 @@ public sealed class AlbaWorldUiController : MonoBehaviour
             Room = room,
             Language = languageToggle,
             SelectPet = selectPet,
-            EnterDress = enterDress
+            EnterDress = enterDress,
+            SelectCharacterPreset = selectCharacterPreset
         };
         _furniture.SelectionChanged += OnFurnitureSelectionChanged;
 
@@ -227,6 +236,8 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         var panel = Panel(_dressRoot.transform, "Wardrobe Panel", PanelColor, new Vector2(0.50f, 0.08f), new Vector2(1f, 0.85f));
         var heading = Label(panel.transform, _language.Get("hud.dress"), 26, Color.white, TextAnchor.MiddleLeft);
         Anchor(heading.rectTransform, new Vector2(0.05f, 0.88f), new Vector2(0.95f, 0.98f));
+        ShowPresetButtons(panel.transform);
+        ShowPaletteButtons(panel.transform);
         var categories = new[]
         {
             ItemCategory.Skin, ItemCategory.Hair, ItemCategory.Outfit, ItemCategory.Shoes, ItemCategory.HumanAccessory
@@ -237,12 +248,12 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         };
         var content = new GameObject("Wardrobe Content", typeof(RectTransform));
         content.transform.SetParent(panel.transform, false);
-        Anchor((RectTransform)content.transform, new Vector2(0.05f, 0.08f), new Vector2(0.95f, 0.66f));
+        Anchor((RectTransform)content.transform, new Vector2(0.05f, 0.08f), new Vector2(0.95f, 0.36f));
         for (var index = 0; index < categories.Length; index++)
         {
             var category = categories[index];
-            var min = new Vector2(0.05f + index * 0.19f, 0.70f);
-            var max = new Vector2(min.x + 0.17f, 0.84f);
+            var min = new Vector2(0.05f + index * 0.19f, 0.40f);
+            var max = new Vector2(min.x + 0.17f, 0.54f);
             AddButton(panel.transform, _language.Get(categoryKeys[index]), new Color(0.22f + index * 0.04f, 0.28f, 0.48f), () =>
             {
                 _wardrobe?.SelectCategory(category);
@@ -252,6 +263,47 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         ShowWardrobeItems(content.transform, ItemCategory.Skin);
         AddButton(_dressRoot.transform, _language.Get("menu.back"), new Color(0.35f, 0.30f, 0.55f), EnterHouseMode, new Vector2(0.02f, 0f), new Vector2(0.18f, 0.06f), 16);
         AddButton(_dressRoot.transform, _language.Get("hud.save"), Mint, EnterHouseMode, new Vector2(0.82f, 0f), new Vector2(0.98f, 0.06f), 16);
+    }
+
+    private void ShowPresetButtons(Transform parent)
+    {
+        var label = Label(parent, _language.Get("hud.switchCharacter"), 13, new Color(0.72f, 0.73f, 0.84f), TextAnchor.MiddleLeft);
+        Anchor(label.rectTransform, new Vector2(0.05f, 0.75f), new Vector2(0.20f, 0.86f));
+        var presets = _presetController?.Presets().ToArray() ?? Array.Empty<CharacterPresetDefinition>();
+        for (var index = 0; index < presets.Length; index++)
+        {
+            var preset = presets[index];
+            var min = new Vector2(0.21f + index * 0.19f, 0.72f);
+            var max = new Vector2(min.x + 0.17f, 0.87f);
+            var value = _language.Get(preset.displayKey);
+            if (value == preset.displayKey)
+                value = preset.presetId;
+            AddButton(parent, value, new Color(0.35f + index * 0.05f, 0.30f, 0.55f), () => _callbacks.SelectCharacterPreset?.Invoke(preset.presetId), min, max, 12);
+        }
+    }
+
+    private void ShowPaletteButtons(Transform parent)
+    {
+        var palettes = _presetController?.Palettes().ToArray() ?? Array.Empty<CharacterPresetPalette>();
+        if (palettes.Length <= 1)
+            return;
+
+        var label = Label(parent, _language.Get("wardrobe.palette"), 13, new Color(0.72f, 0.73f, 0.84f), TextAnchor.MiddleLeft);
+        Anchor(label.rectTransform, new Vector2(0.05f, 0.57f), new Vector2(0.20f, 0.68f));
+        for (var index = 0; index < palettes.Length; index++)
+        {
+            var palette = palettes[index];
+            var min = new Vector2(0.21f + index * 0.19f, 0.55f);
+            var max = new Vector2(min.x + 0.17f, 0.70f);
+            var value = _language.Get(palette.displayKey);
+            if (value == palette.displayKey)
+                value = palette.paletteId;
+            AddButton(parent, value, palette.outfitTint, () =>
+            {
+                var applied = _presetController != null && _presetController.TrySelectPalette(palette.paletteId);
+                ShowNotice(applied ? _language.Get("hud.saved") : _language.Get("photo.error"), applied);
+            }, min, max, 12);
+        }
     }
 
     private void ShowWardrobeItems(Transform content, ItemCategory category)

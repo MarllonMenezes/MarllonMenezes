@@ -16,6 +16,7 @@ public sealed class CharacterWardrobeController : MonoBehaviour
     private Transform _character = null!;
     private GameSaveData _save = null!;
     private ISaveService _saveService = null!;
+    private CharacterPresetController? _presetController;
 
     public ItemCategory SelectedCategory { get; private set; } = ItemCategory.Skin;
     public event Action<ItemCategory>? SelectionChanged;
@@ -36,6 +37,12 @@ public sealed class CharacterWardrobeController : MonoBehaviour
         ApplySavedVisuals();
     }
 
+    public void AttachPresetController(CharacterPresetController presetController)
+    {
+        _presetController = presetController;
+        ApplySavedVisuals();
+    }
+
     public void SelectCategory(ItemCategory category)
     {
         if (!IsWardrobeCategory(category))
@@ -53,6 +60,9 @@ public sealed class CharacterWardrobeController : MonoBehaviour
     {
         var visual = _catalog.GetVisual(itemId);
         if (visual?.definition == null || !IsWardrobeCategory(visual.definition.category))
+            return false;
+        if (visual.definition.category == ItemCategory.HumanAccessory &&
+            _presetController != null && !_presetController.SupportsAccessory(itemId))
             return false;
         if (!IsBodyCompatible(visual.compatibleBodies))
             return false;
@@ -135,6 +145,12 @@ public sealed class CharacterWardrobeController : MonoBehaviour
     {
         if (_character == null)
             return;
+
+        if (_presetController != null)
+        {
+            _presetController.ApplyCategoryTint(category, tint);
+            return;
+        }
 
         var prefix = string.Equals(_save.character.bodyId, "body.boy", StringComparison.Ordinal) ? "Boy" : "Girl";
         var names = category switch
