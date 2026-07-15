@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AlbaWorld.Catalog;
 using AlbaWorld.Core;
 using AlbaWorld.Game;
+using AlbaWorld.Pets;
 using AlbaWorld.Runtime;
 using AlbaWorld.UI;
 using UnityEngine;
@@ -21,6 +23,9 @@ public sealed class AlbaWorldApp : MonoBehaviour
     private LanguageService _language = null!;
     private RewardedAdsService _ads = null!;
     private PhotoExporter _photo = null!;
+    [SerializeField] private PetAssemblyController? _petAssemblyController;
+    [SerializeField] private Transform? _petMount;
+    private PetPersistenceCoordinator? _petFlow;
     private readonly List<SceneSnapshot> _rooms = new();
     private int _roomIndex;
     private SceneSnapshot _currentSnapshot = null!;
@@ -43,6 +48,7 @@ public sealed class AlbaWorldApp : MonoBehaviour
         _ads = new RewardedAdsService(_save);
         _photo = new PhotoExporter();
         RestoreState();
+        InitializePetFlow();
         _canvas = UiFactory.CreateCanvas();
         EnsureEventSystem();
         var root = UiFactory.Panel(_canvas.transform, "Root", new Color(0.98f, 0.96f, 1f), Vector2.zero, Vector2.one);
@@ -63,7 +69,11 @@ public sealed class AlbaWorldApp : MonoBehaviour
         _selectedOutfit = string.IsNullOrWhiteSpace(_save.selectedOutfitId) ? _selectedOutfit : _save.selectedOutfitId;
         _selectedShoes = string.IsNullOrWhiteSpace(_save.selectedShoesId) ? _selectedShoes : _save.selectedShoesId;
         _selectedAccessory = string.IsNullOrWhiteSpace(_save.selectedAccessoryId) ? _selectedAccessory : _save.selectedAccessoryId;
-        _selectedPet = string.IsNullOrWhiteSpace(_save.selectedPetId) ? _selectedPet : _save.selectedPetId;
+        // Schema 3 stores the authoritative pet loadout separately from the legacy
+        // selection mirror. Prefer it when present so a 3D selection survives a reboot
+        // even if an older writer left selectedPetId at its default.
+        var restoredPetId = string.IsNullOrWhiteSpace(_save.pet?.petId) ? _save.selectedPetId : _save.pet.petId;
+        _selectedPet = string.IsNullOrWhiteSpace(restoredPetId) ? _selectedPet : restoredPetId;
         _selectedPetAccessory = string.IsNullOrWhiteSpace(_save.selectedPetAccessoryId) ? _selectedPetAccessory : _save.selectedPetAccessoryId;
         for (var i = 0; i < 2; i++)
         {
@@ -77,6 +87,59 @@ public sealed class AlbaWorldApp : MonoBehaviour
         }
     }
 
+    private void InitializePetFlow()
+    {
+        _petAssemblyController ??= GetComponentInChildren<PetAssemblyController>();
+        if (_petAssemblyController == null)
+            return;
+
+        var catalog = Resources.Load<ItemCatalog3D>("Data/AlbaItemCatalog3D");
+        if (catalog == null)
+        {
+            Debug.LogWarning("Pet assembly is present but the 3D item catalog is unavailable; continuing with the offline 2D flow.");
+            return;
+        }
+
+        var mount = _petMount != null ? _petMount : _petAssemblyController.transform;
+        _petAssemblyController.Initialize(catalog, mount);
+        _petFlow = new PetPersistenceCoordinator(_save, _saveService, _petAssemblyController);
+        _petFlow.Restore();
+        _selectedPet = _save.pet.petId;
+    }
+
+    /// <summary>
+    /// Connects an optional 3D flow scene to the same save and pet assembly used by the
+    /// editor. The 2D prototype does not create this scene, so the seam remains inert
+    /// until a room/photo controller supplies its assembly and mount.
+    /// </summary>
+    public void ConfigurePetFlow(PetAssemblyController assembly, IItemCatalog3D catalog, Transform mount)
+    {
+        if (assembly == null) throw new ArgumentNullException(nameof(assembly));
+        if (catalog == null) throw new ArgumentNullException(nameof(catalog));
+        if (mount == null) throw new ArgumentNullException(nameof(mount));
+
+        _petAssemblyController = assembly;
+        _petMount = mount;
+        assembly.Initialize(catalog, mount);
+        if (_save != null && _saveService != null)
+        {
+            _petFlow = new PetPersistenceCoordinator(_save, _saveService, assembly);
+            _petFlow.Restore();
+            _selectedPet = _save.pet.petId;
+        }
+    }
+
+    /// <summary>Returns the active 3D pet root for house and photo controllers.</summary>
+    public GameObject? ActivePetRoot => _petFlow?.ActivePetRoot;
+
+    /// <summary>Places the active pet in a bounded 3D room context when one is available.</summary>
+    public bool TryPrepareHousePet(Transform roomRoot, Vector3 desiredLocalPosition, Vector3 roomMin, Vector3 roomMax) =>
+        _petFlow != null && _petFlow.TryPrepareHouse(roomRoot, desiredLocalPosition, roomMin, roomMax);
+
+    /// <summary>Places the active pet in a photo context without changing the exporter.</summary>
+    public bool TryPreparePhotoPet(Transform photoRoot, Vector3 localPosition) =>
+        _petFlow != null && _petFlow.TryPreparePhoto(photoRoot, localPosition);
+
     private void Persist()
     {
         _save.languageCode = _language.Code;
@@ -87,6 +150,9 @@ public sealed class AlbaWorldApp : MonoBehaviour
         _save.selectedAccessoryId = _selectedAccessory;
         _save.selectedPetId = _selectedPet;
         _save.selectedPetAccessoryId = _selectedPetAccessory;
+        _save.pet ??= new PetLoadoutData();
+        _save.pet.petId = _selectedPet;
+        _save.pet.accessoryIds ??= Array.Empty<string>();
         _save.roomJson = _rooms.Select(JsonUtility.ToJson).ToArray();
         _saveService.Save(_save);
     }
@@ -190,8 +256,27 @@ public sealed class AlbaWorldApp : MonoBehaviour
         UiFactory.Image(preview, "Pet", ColorSpriteFactory.Circle, pet?.tint ?? Color.white, new Vector2(0.5f, 0.53f), new Vector2(220, 220));
         UiFactory.Label(preview, _language.Get(pet?.displayKey ?? "item.pet.cat"), 24, UiFactory.Ink);
         var choices = UiFactory.Panel(_content, "Choices", Color.clear, new Vector2(0.44f, 0.05f), new Vector2(1, 0.84f));
-        AddChoiceRow(choices, "Pet", ItemCategory.Pet, _selectedPet, id => { _selectedPet = id; Persist(); ShowPet(); });
+        AddChoiceRow(choices, "Pet", ItemCategory.Pet, _selectedPet, SelectPet);
         AddChoiceRow(choices, "Accessory", ItemCategory.PetAccessory, _selectedPetAccessory, id => { _selectedPetAccessory = id; Persist(); ShowPet(); });
+    }
+
+    private void SelectPet(string id)
+    {
+        // A 3D flow must commit the save only after the assembly has accepted the
+        // requested prefab. The legacy 2D flow keeps its existing immediate save path.
+        if (_petFlow != null)
+        {
+            if (!_petFlow.TrySelect(id))
+                return;
+
+            _selectedPet = _save.pet.petId;
+            ShowPet();
+            return;
+        }
+
+        _selectedPet = id;
+        Persist();
+        ShowPet();
     }
 
     private void ShowHouse()
@@ -302,5 +387,130 @@ public sealed class AlbaWorldApp : MonoBehaviour
         _language.Set(code);
         Persist();
         ShowSettings();
+    }
+}
+
+/// <summary>
+/// Small integration seam shared by pet editor, house, and photo contexts. It owns no
+/// scene UI and therefore remains usable by the current 2D prototype and future 3D flow.
+/// </summary>
+public sealed class PetPersistenceCoordinator
+{
+    public const string DefaultPetId = "pet.cat";
+
+    private readonly GameSaveData _save;
+    private readonly ISaveService _saveService;
+    private readonly PetAssemblyController _assembly;
+
+    public PetPersistenceCoordinator(GameSaveData save, ISaveService saveService, PetAssemblyController assembly)
+    {
+        _save = save ?? throw new ArgumentNullException(nameof(save));
+        _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
+        _assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
+        SaveMigration.Upgrade(_save);
+    }
+
+    /// <summary>The root instantiated by the shared assembly, suitable for room/photo framing.</summary>
+    public GameObject? ActivePetRoot => _assembly.ActiveInstance;
+
+    /// <summary>
+    /// Applies a user selection first, then mirrors the accepted ID into both the current
+    /// loadout and legacy selection field before saving. A rejected ID never saves.
+    /// </summary>
+    public bool TrySelect(string petId)
+    {
+        var candidate = CloneLoadout(_save.pet);
+        candidate.petId = string.IsNullOrWhiteSpace(petId) ? DefaultPetId : petId;
+
+        if (!_assembly.TryApply(candidate))
+            return false;
+
+        var acceptedId = _assembly.ActivePetId;
+        if (string.IsNullOrWhiteSpace(acceptedId))
+            return false;
+
+        _save.pet.petId = acceptedId;
+        _save.selectedPetId = acceptedId;
+        _save.schemaVersion = SaveMigration.CurrentSchemaVersion;
+        _saveService.Save(_save);
+        return true;
+    }
+
+    /// <summary>
+    /// Restores the saved loadout. A missing first pet is safely instantiated as the cat;
+    /// the in-memory save is repaired without writing until a successful selection/save.
+    /// </summary>
+    public bool Restore()
+    {
+        SaveMigration.Upgrade(_save);
+        var hadActivePet = _assembly.ActiveInstance != null;
+        var applied = _assembly.TryApply(_save.pet);
+        if (applied)
+        {
+            MirrorActivePetId();
+            return true;
+        }
+
+        // PetAssemblyController intentionally reports a fallback as false so callers can
+        // distinguish it from an exact selection. On a fresh boot, normalize that fallback
+        // to keep future JSON writes free of the missing ID.
+        if (!hadActivePet && _assembly.ActiveInstance != null && _assembly.ActivePetId == DefaultPetId)
+        {
+            _save.pet.petId = DefaultPetId;
+            _save.selectedPetId = DefaultPetId;
+            return true;
+        }
+
+        return _assembly.ActiveInstance != null;
+    }
+
+    /// <summary>Reparents the shared active root to a bounded room context.</summary>
+    public bool TryPrepareHouse(Transform roomRoot, Vector3 desiredLocalPosition, Vector3 roomMin, Vector3 roomMax)
+    {
+        if (roomRoot == null || ActivePetRoot == null)
+            return false;
+
+        var min = Vector3.Min(roomMin, roomMax);
+        var max = Vector3.Max(roomMin, roomMax);
+        return Attach(roomRoot, new Vector3(
+            Mathf.Clamp(desiredLocalPosition.x, min.x, max.x),
+            Mathf.Clamp(desiredLocalPosition.y, min.y, max.y),
+            Mathf.Clamp(desiredLocalPosition.z, min.z, max.z)));
+    }
+
+    /// <summary>Reparents the shared active root to a photo context; UI/export remains external.</summary>
+    public bool TryPreparePhoto(Transform photoRoot, Vector3 localPosition)
+    {
+        return photoRoot != null && ActivePetRoot != null && Attach(photoRoot, localPosition);
+    }
+
+    private bool Attach(Transform parent, Vector3 localPosition)
+    {
+        var root = ActivePetRoot;
+        if (root == null)
+            return false;
+
+        root.transform.SetParent(parent, false);
+        root.transform.localPosition = localPosition;
+        return true;
+    }
+
+    private void MirrorActivePetId()
+    {
+        if (string.IsNullOrWhiteSpace(_assembly.ActivePetId))
+            return;
+
+        _save.pet.petId = _assembly.ActivePetId;
+        _save.selectedPetId = _assembly.ActivePetId;
+    }
+
+    private static PetLoadoutData CloneLoadout(PetLoadoutData source)
+    {
+        return new PetLoadoutData
+        {
+            petId = source.petId,
+            colorId = source.colorId,
+            accessoryIds = source.accessoryIds == null ? Array.Empty<string>() : (string[])source.accessoryIds.Clone()
+        };
     }
 }
