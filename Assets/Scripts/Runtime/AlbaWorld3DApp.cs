@@ -212,6 +212,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             BringFurnitureForward,
             SendFurnitureBackward,
             RemoveFurniture,
+            UndoRemoveFurniture,
             SwitchCharacter,
             CapturePhoto,
             ChangeRoomStyle,
@@ -227,12 +228,8 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         if (_furniture == null)
             return;
 
-        var position = new Vector3(
-            Mathf.Lerp(-3.6f, 3.0f, Mathf.Abs(itemId.GetHashCode() % 100) / 100f),
-            0.2f,
-            Mathf.Lerp(-1.5f, 2.6f, Mathf.Abs(itemId.GetHashCode() % 100) / 100f));
-        var added = _furniture.TryAdd(itemId, position);
-        ShowNotice(added ? _language.Get("hud.saved") : _language.Get("photo.error"), added);
+        var added = _furniture.TryAddToFirstFreeSlot(itemId);
+        ShowNotice(added ? _language.Get("hud.saved") : _language.Get("hud.noFreeSlot"), added);
     }
 
     private void ScaleFurniture(float delta)
@@ -268,6 +265,14 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         if (_furniture == null || string.IsNullOrWhiteSpace(_furniture.SelectedInstanceId))
             return;
         ShowNotice(_furniture.TryRemove(_furniture.SelectedInstanceId) ? _language.Get("hud.saved") : _language.Get("photo.error"), true);
+    }
+
+    private void UndoRemoveFurniture()
+    {
+        if (_furniture == null)
+            return;
+        var restored = _furniture.TryUndoRemove();
+        ShowNotice(restored ? _language.Get("hud.saved") : _language.Get("photo.error"), restored);
     }
 
     private void SelectPet(string id)

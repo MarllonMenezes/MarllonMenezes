@@ -31,6 +31,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         public Action? BringForward;
         public Action? SendBackward;
         public Action? RemoveFurniture;
+        public Action? UndoRemoveFurniture;
         public Action? SwitchCharacter;
         public Action? Photo;
         public Action? Room;
@@ -65,6 +66,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         Action bringForward,
         Action sendBackward,
         Action removeFurniture,
+        Action undoRemoveFurniture,
         Action switchCharacter,
         Action photo,
         Action room,
@@ -82,6 +84,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
             BringForward = bringForward,
             SendBackward = sendBackward,
             RemoveFurniture = removeFurniture,
+            UndoRemoveFurniture = undoRemoveFurniture,
             SwitchCharacter = switchCharacter,
             Photo = photo,
             Room = room,
@@ -89,6 +92,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
             SelectPet = selectPet,
             EnterDress = enterDress
         };
+        _furniture.SelectionChanged += OnFurnitureSelectionChanged;
 
         var canvas = GetComponent<Canvas>();
         if (canvas == null)
@@ -252,7 +256,8 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         AddControlButton(content, _language.Get("hud.front"), new Vector2(0.88f, 0.08f), new Vector2(0.98f, 0.30f), () => _callbacks.BringForward?.Invoke());
         AddControlButton(content, _language.Get("hud.back"), new Vector2(0.55f, 0.08f), new Vector2(0.65f, 0.30f), () => _callbacks.SendBackward?.Invoke());
         AddControlButton(content, _language.Get("hud.delete"), new Color(0.70f, 0.25f, 0.38f), new Vector2(0.66f, 0.08f), new Vector2(0.76f, 0.30f), () => _callbacks.RemoveFurniture?.Invoke());
-        SetFurnitureSelection(!string.IsNullOrWhiteSpace(_furniture.SelectedInstanceId));
+        AddButton(content, _language.Get("hud.undo"), PanelSoft, () => _callbacks.UndoRemoveFurniture?.Invoke(), new Vector2(0.44f, 0.08f), new Vector2(0.54f, 0.30f), 12);
+        SetFurnitureSelection(_furniture.HasSelection);
     }
 
     private void ShowActionsPage(Transform content)
@@ -306,6 +311,14 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         _dressRoot = null!;
         _petName = null!;
         _notice = null!;
+    }
+
+    private void OnFurnitureSelectionChanged(string _) => SetFurnitureSelection(_furniture.HasSelection);
+
+    private void OnDestroy()
+    {
+        if (_furniture != null)
+            _furniture.SelectionChanged -= OnFurnitureSelectionChanged;
     }
 
     private void ClearNotice()
