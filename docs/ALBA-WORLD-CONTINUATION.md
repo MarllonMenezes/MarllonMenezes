@@ -40,9 +40,20 @@ O relatório completo está em [`docs/testing/kenney-pets-test-report.md`](testi
 
 Os 24 prefabs medem entre 422 e 951 triângulos. Isso atende ao teto atual de 7.000 triângulos validado pelo teste; fica abaixo do alvo de design de 4.000–7.000 para um pet equipado e deve ser considerado no balanceamento visual/performance futuro, sem adicionar geometria nesta etapa.
 
-## Limitações conhecidas
+## Revisão visual e limitações conhecidas
 
-Não foi gerada uma grade Game view dos 24 pets em 16:9 e 20:9. O projeto não possui um capturador de pets, e o ambiente headless `-nographics` não oferece uma renderização Game view confiável. As duas falhas de render nographics já conhecidas dos personagens não foram corrigidas, repetidas nem incluídas neste escopo. A inspeção manual deve ocorrer em um editor com GPU antes do trabalho de rooms/furniture, sem alterar os assets de personagens.
+Foi gerada uma grade GPU-backed exclusivamente com os 24 prefabs Kenney (6×4, rótulos de espécie) por um helper editor-only temporário. O helper foi removido após a captura e não alterou modelos, materiais, prefabs ou personagens. Os PNGs arquivados são:
+
+- `Art/Reviews/Pets/kenney-pets-grid-16x9.png` — 1600×900 (16:9)
+- `Art/Reviews/Pets/kenney-pets-grid-20x9.png` — 2000×900 (20:9)
+
+Comando executado sem `-nographics` (Unity usou o backend gráfico e saiu com código 0):
+
+```powershell
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -quit -projectPath . -executeMethod AlbaWorld.Editor.KenneyPetGridCaptureTemp.Capture -logFile work/task6-kenney-grid-gpu.log
+```
+
+A inspeção confirmou as 24 espécies visíveis, centralizadas e legendadas nos dois formatos. As duas falhas de render `-nographics` já conhecidas dos personagens não foram corrigidas, repetidas nem incluídas neste escopo. A revisão futura de rooms/furniture deve preservar esse limite e não alterar os assets de personagens.
 
 As alterações não consolidadas da antiga Tarefa 6 de personagens continuam no worktree (modelos, materiais, prefabs, scripts, testes e imagens). Não fazer limpeza, restauração ou commit amplo delas ao integrar este handoff.
 

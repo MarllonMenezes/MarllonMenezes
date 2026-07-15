@@ -73,7 +73,18 @@ The source is archived at `Assets/Art3D/Pets/Source/KenneyCubePets` and mirrored
 
 ## Visual review and limitations
 
-No new model, texture or character asset was created. A 24-prefab Game-view grid at 16:9/20:9 was not generated in this audit: the project has no pet-grid capture path, and the available headless `-nographics` environment cannot provide a reliable Game-view render. Existing character render failures were not changed or retried. Manual visual review should be performed in the Unity Game view on a graphics-capable editor before the rooms/furniture pass; it must not modify character assets.
+No new model, texture or character asset was created. A temporary editor-only helper instantiated the 24 local Kenney prefabs in a GPU-backed Unity Game View-style scene, added review labels, rendered both requested ratios, and was removed after capture:
+
+```powershell
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -quit -projectPath . -executeMethod AlbaWorld.Editor.KenneyPetGridCaptureTemp.Capture -logFile work/task6-kenney-grid-gpu.log
+```
+
+The command intentionally omits `-nographics`; Unity exited with code 0 and logged both captures. The archived outputs are:
+
+- [`Art/Reviews/Pets/kenney-pets-grid-16x9.png`](../../Art/Reviews/Pets/kenney-pets-grid-16x9.png) — 1600×900 (16:9).
+- [`Art/Reviews/Pets/kenney-pets-grid-20x9.png`](../../Art/Reviews/Pets/kenney-pets-grid-20x9.png) — 2000×900 (20:9).
+
+Manual inspection confirmed all 24 labeled pets are visible, centered in a 6×4 grid, with readable labels and no character assets in the capture scene. Existing character render failures were not changed or retried. The temporary helper and its `.meta` file were removed; only the two PNG review outputs are retained.
 
 ## Handoff
 
