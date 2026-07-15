@@ -10,6 +10,7 @@ namespace AlbaWorld.Runtime;
 
 public enum AlbaWorldUiMode
 {
+    Welcome,
     Casa,
     Vestir
 }
@@ -41,6 +42,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         public Action<string>? SelectPet;
         public Action? EnterDress;
         public Action<string>? SelectCharacterPreset;
+        public Action? StartGame;
     }
 
     private LanguageService _language = null!;
@@ -49,12 +51,15 @@ public sealed class AlbaWorldUiController : MonoBehaviour
     private CharacterPresetController? _presetController;
     private Callbacks _callbacks = new();
     private GameObject _safeRoot = null!;
+    private GameObject _welcomeRoot = null!;
     private GameObject _houseRoot = null!;
     private GameObject _dressRoot = null!;
     private Text _petName = null!;
+    private Text _roomName = null!;
     private Text _notice = null!;
     private readonly List<Button> _selectionButtons = new();
     private string _currentPetName = string.Empty;
+    private string _currentRoomName = string.Empty;
     private string _pendingNotice = string.Empty;
     private bool _pendingNoticeSuccess;
 
@@ -91,7 +96,8 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         Action languageToggle,
         Action<string> selectPet,
         Action enterDress,
-        Action<string>? selectCharacterPreset = null)
+        Action<string>? selectCharacterPreset = null,
+        Action? startGame = null)
     {
         _language = language ?? throw new ArgumentNullException(nameof(language));
         _furniture = furniture ?? throw new ArgumentNullException(nameof(furniture));
@@ -110,7 +116,8 @@ public sealed class AlbaWorldUiController : MonoBehaviour
             Language = languageToggle,
             SelectPet = selectPet,
             EnterDress = enterDress,
-            SelectCharacterPreset = selectCharacterPreset
+            SelectCharacterPreset = selectCharacterPreset,
+            StartGame = startGame
         };
         _furniture.SelectionChanged += OnFurnitureSelectionChanged;
 
@@ -131,7 +138,16 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         _safeRoot.transform.SetParent(transform, false);
         var safeRect = (RectTransform)_safeRoot.transform;
         Anchor(safeRect, new Vector2(0.02f, 0.02f), new Vector2(0.98f, 0.98f));
+        _currentRoomName = _language.Get("room.sunny");
         BuildHouseMode();
+    }
+
+    public void EnterWelcomeMode()
+    {
+        Mode = AlbaWorldUiMode.Welcome;
+        DestroyModeRoots();
+        BuildWelcomeMode();
+        ModeChanged?.Invoke(Mode);
     }
 
     public void EnterHouseMode()
@@ -157,7 +173,9 @@ public sealed class AlbaWorldUiController : MonoBehaviour
             return;
         var mode = Mode;
         DestroyModeRoots();
-        if (mode == AlbaWorldUiMode.Casa)
+        if (mode == AlbaWorldUiMode.Welcome)
+            BuildWelcomeMode();
+        else if (mode == AlbaWorldUiMode.Casa)
             BuildHouseMode();
         else
             BuildDressMode();
@@ -170,6 +188,13 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         _currentPetName = petName ?? string.Empty;
         if (_petName != null)
             _petName.text = _currentPetName;
+    }
+
+    public void SetRoomName(string roomName)
+    {
+        _currentRoomName = string.IsNullOrWhiteSpace(roomName) ? _language?.Get("hud.room") ?? "Room" : roomName;
+        if (_roomName != null)
+            _roomName.text = _currentRoomName;
     }
 
     public void SetFurnitureSelection(bool selected)
@@ -200,8 +225,10 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         var top = Panel(_houseRoot.transform, "Top Bar", PanelColor, new Vector2(0f, 0.875f), new Vector2(1f, 1f));
         var title = Label(top.transform, _language.Get("app.title"), 34, Color.white, TextAnchor.MiddleLeft);
         Anchor(title.rectTransform, new Vector2(0.025f, 0.18f), new Vector2(0.28f, 0.92f));
-        var room = Label(top.transform, _language.Get("hud.house"), 16, new Color(0.72f, 0.73f, 0.84f), TextAnchor.MiddleLeft);
-        Anchor(room.rectTransform, new Vector2(0.29f, 0.20f), new Vector2(0.47f, 0.85f));
+        var roomButton = AddButton(top.transform, _currentRoomName,
+            new Color(0.16f, 0.19f, 0.31f), () => _callbacks.Room?.Invoke(),
+            new Vector2(0.29f, 0.16f), new Vector2(0.47f, 0.86f), 14);
+        _roomName = roomButton.GetComponentInChildren<Text>();
         _petName = Label(top.transform, _currentPetName, 16, Mint, TextAnchor.MiddleLeft);
         Anchor(_petName.rectTransform, new Vector2(0.49f, 0.20f), new Vector2(0.64f, 0.85f));
         var offline = Label(top.transform, _language.Get("hud.offline"), 13, Mint, TextAnchor.MiddleLeft);
@@ -219,6 +246,37 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         _notice = Label(dock.transform, string.Empty, 15, Mint, TextAnchor.MiddleRight);
         Anchor(_notice.rectTransform, new Vector2(0.35f, 0.80f), new Vector2(0.98f, 0.98f));
         ShowFurniturePage(content.transform);
+    }
+
+    private void BuildWelcomeMode()
+    {
+        _welcomeRoot = new GameObject("Welcome Mode", typeof(RectTransform));
+        _welcomeRoot.transform.SetParent(_safeRoot.transform, false);
+        Anchor((RectTransform)_welcomeRoot.transform, Vector2.zero, Vector2.one);
+
+        var backdrop = Panel(_welcomeRoot.transform, "Welcome Backdrop", new Color(0.035f, 0.045f, 0.10f, 0.96f), Vector2.zero, Vector2.one);
+        var card = Panel(_welcomeRoot.transform, "Welcome Card", new Color(0.08f, 0.10f, 0.20f, 0.98f), new Vector2(0.18f, 0.08f), new Vector2(0.82f, 0.92f));
+        var title = Label(card.transform, _language.Get("welcome.title"), 42, Color.white, TextAnchor.MiddleCenter);
+        Anchor(title.rectTransform, new Vector2(0.08f, 0.78f), new Vector2(0.92f, 0.94f));
+        var subtitle = Label(card.transform, _language.Get("welcome.subtitle"), 20, new Color(0.72f, 0.86f, 0.95f), TextAnchor.MiddleCenter);
+        Anchor(subtitle.rectTransform, new Vector2(0.10f, 0.70f), new Vector2(0.90f, 0.80f));
+
+        var tips = new[] { "welcome.select", "welcome.drag", "welcome.modes" };
+        for (var index = 0; index < tips.Length; index++)
+        {
+            var min = new Vector2(0.08f + index * 0.30f, 0.40f);
+            var max = new Vector2(min.x + 0.26f, 0.65f);
+            var tip = Panel(card.transform, $"Tip {index + 1}", new Color(0.12f, 0.15f, 0.27f, 1f), min, max);
+            var number = Label(tip.transform, (index + 1).ToString(), 30, Pink, TextAnchor.UpperCenter);
+            Anchor(number.rectTransform, new Vector2(0.06f, 0.58f), new Vector2(0.94f, 0.92f));
+            var message = Label(tip.transform, _language.Get(tips[index]), 16, Color.white, TextAnchor.MiddleCenter);
+            Anchor(message.rectTransform, new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.60f));
+        }
+
+        AddButton(card.transform, _language.Get("welcome.play"), Pink, () => _callbacks.StartGame?.Invoke(), new Vector2(0.27f, 0.14f), new Vector2(0.73f, 0.30f), 22);
+        AddButton(card.transform, _language.Get("welcome.language"), new Color(0.18f, 0.24f, 0.42f), () => _callbacks.Language?.Invoke(), new Vector2(0.38f, 0.04f), new Vector2(0.62f, 0.11f), 14);
+        var offline = Label(backdrop.transform, _language.Get("hud.offline"), 14, Mint, TextAnchor.MiddleRight);
+        Anchor(offline.rectTransform, new Vector2(0.78f, 0.02f), new Vector2(0.97f, 0.06f));
     }
 
     private void BuildDressMode()
@@ -419,13 +477,17 @@ public sealed class AlbaWorldUiController : MonoBehaviour
     private void DestroyModeRoots()
     {
         _selectionButtons.Clear();
+        if (_welcomeRoot != null)
+            DestroyObject(_welcomeRoot);
         if (_houseRoot != null)
             DestroyObject(_houseRoot);
         if (_dressRoot != null)
             DestroyObject(_dressRoot);
+        _welcomeRoot = null!;
         _houseRoot = null!;
         _dressRoot = null!;
         _petName = null!;
+        _roomName = null!;
         _notice = null!;
     }
 

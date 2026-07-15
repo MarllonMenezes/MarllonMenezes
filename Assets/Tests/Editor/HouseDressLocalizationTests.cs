@@ -14,7 +14,8 @@ public sealed class HouseDressLocalizationTests
         {
             "hud.house", "hud.dress", "hud.furniture", "hud.actions", "hud.delete",
             "hud.undo", "hud.moveHint", "hud.noFreeSlot", "wardrobe.skin", "wardrobe.hair",
-            "wardrobe.outfit", "wardrobe.shoes", "wardrobe.accessories"
+            "wardrobe.outfit", "wardrobe.shoes", "wardrobe.accessories", "welcome.title", "welcome.subtitle",
+            "welcome.select", "welcome.drag", "welcome.modes", "welcome.play", "welcome.language", "room.sunny", "room.cozy"
         };
 
         foreach (var key in keys)

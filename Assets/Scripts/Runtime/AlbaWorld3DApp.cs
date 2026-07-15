@@ -272,11 +272,22 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             ToggleLanguage,
             SelectPet,
             () => { },
-            SelectCharacterPreset);
+            SelectCharacterPreset,
+            CompleteOnboarding);
         _ui.SetPetName(_language.Get("item." + _save.pet.petId));
+        _ui.SetRoomName(_language.Get(_save.activeRoomId == "room.cozy" ? "room.cozy" : "room.sunny"));
         _ui.AttachWardrobe(_wardrobe);
         _ui.AttachCharacterPresets(_presetController);
+        if (!_save.onboardingCompleted)
+            _ui.EnterWelcomeMode();
         _movement?.SetInputEnabled(_ui.Mode == AlbaWorldUiMode.Casa);
+    }
+
+    private void CompleteOnboarding()
+    {
+        _save.onboardingCompleted = true;
+        Persist();
+        _ui?.EnterHouseMode();
     }
 
     private void AddFurniture(string itemId)
@@ -399,6 +410,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             floor.sharedMaterial = CreateMaterial(_save.activeRoomId == "room.sunny" ? new Color(0.16f, 0.12f, 0.25f) : new Color(0.10f, 0.22f, 0.25f));
         _furniture?.SetRoom(_save.activeRoomId);
         Persist();
+        _ui?.SetRoomName(_language.Get(_save.activeRoomId == "room.cozy" ? "room.cozy" : "room.sunny"));
         ShowNotice(_language.Get("hud.saved"), true);
     }
 
@@ -415,6 +427,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         _save.languageCode = _language.Code;
         Persist();
         _ui?.RefreshLanguage();
+        _ui?.SetRoomName(_language.Get(_save.activeRoomId == "room.cozy" ? "room.cozy" : "room.sunny"));
         ShowNotice(_language.Get("hud.saved"), true);
     }
 
