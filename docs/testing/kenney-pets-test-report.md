@@ -1,0 +1,80 @@
+# Kenney pets — relatório de verificação da Tarefa 6
+
+Data da auditoria: 15 de julho de 2026
+Projeto: Alba World, Unity 6000.3.19f1, branch `feature/alba-world-3d`
+
+## Resultado
+
+Os 24 pets Kenney estão disponíveis offline como prefabs locais, com IDs estáveis, entradas de catálogo e traduções `pt-BR`/`en`. Os IDs legados `pet.cat` e `pet.dog` permanecem presentes. Não foi detectada dependência de rede, pacote runtime ou permissão Android nova.
+
+| ID estável | Fonte FBX | Triângulos no prefab |
+| --- | --- | ---: |
+| `pet.beaver` | `animal-beaver.fbx` | 670 |
+| `pet.bee` | `animal-bee.fbx` | 742 |
+| `pet.bunny` | `animal-bunny.fbx` | 575 |
+| `pet.cat` | `animal-cat.fbx` | 684 |
+| `pet.caterpillar` | `animal-caterpillar.fbx` | 578 |
+| `pet.chick` | `animal-chick.fbx` | 490 |
+| `pet.cow` | `animal-cow.fbx` | 578 |
+| `pet.crab` | `animal-crab.fbx` | 676 |
+| `pet.deer` | `animal-deer.fbx` | 760 |
+| `pet.dog` | `animal-dog.fbx` | 490 |
+| `pet.elephant` | `animal-elephant.fbx` | 676 |
+| `pet.fish` | `animal-fish.fbx` | 422 |
+| `pet.fox` | `animal-fox.fbx` | 568 |
+| `pet.giraffe` | `animal-giraffe.fbx` | 598 |
+| `pet.hog` | `animal-hog.fbx` | 706 |
+| `pet.koala` | `animal-koala.fbx` | 594 |
+| `pet.lion` | `animal-lion.fbx` | 889 |
+| `pet.monkey` | `animal-monkey.fbx` | 918 |
+| `pet.panda` | `animal-panda.fbx` | 734 |
+| `pet.parrot` | `animal-parrot.fbx` | 530 |
+| `pet.penguin` | `animal-penguin.fbx` | 558 |
+| `pet.pig` | `animal-pig.fbx` | 424 |
+| `pet.polar` | `animal-polar.fbx` | 522 |
+| `pet.tiger` | `animal-tiger.fbx` | 951 |
+
+The current prefab test enforces the project ceiling of 7,000 triangles, and every species is below it. The original design target was 4,000–7,000 triangles per equipped pet; these intentionally low-poly Kenney meshes are below that lower target, which is recorded as a follow-up art/performance consideration rather than a reason to add geometry in this task.
+
+## Fresh commands and evidence
+
+Commands were run from the project root. Unity commands intentionally omit `-quit`; the Test Framework exits after writing its result file.
+
+```powershell
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneySourceManifestTests -testResults work/task6-kenney-source.xml -logFile work/task6-kenney-source.log
+# result: Passed, 2 total, 2 passed, 0 failed
+
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneyPetPrefabTests -testResults work/task6-kenney-prefab.xml -logFile work/task6-kenney-prefab.log
+# result: Passed, 2 total, 2 passed, 0 failed
+
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneyPetCatalogTests -testResults work/task6-kenney-catalog.xml -logFile work/task6-kenney-catalog.log
+# result: Passed, 2 total, 2 passed, 0 failed
+
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform playmode -testResults work/task6-kenney-playmode.xml -logFile work/task6-kenney-playmode.log
+# result: Passed, 21 total, 21 passed, 0 failed
+
+& 'C:\Program Files\dotnet\dotnet.exe' test Tools\CoreTests\AlbaWorld.CoreTests.csproj --no-restore
+# result: Passed, 14 total, 14 passed, 0 failed
+```
+
+Triangle counts were emitted by a temporary editor-only audit test and saved at `work/task6-kenney-triangles.xml` (1/1 passed); the helper and its `.meta` file were removed after the audit. The focused test XML and logs above are ignored build evidence and are not product assets.
+
+The focused Edit Mode tests cover:
+
+- 24 manifest entries, unique IDs, safe local source paths and CC0 metadata;
+- 24 prefab references, shared URP Simple Lit material/colormap, finite bounds, unit roots, no cameras/lights and the 7,000-triangle ceiling;
+- one catalog entry per ID, `Pet` category, `Pet` slot, prefab path and both localization tables.
+
+The 21 Play Mode tests cover selection of every species, follow motion, invalid-asset fallback, save migration, persistence, room placement and photo-context reuse. The .NET suite covers offline save/schema behavior.
+
+## Source and license
+
+The source is archived at `Assets/Art3D/Pets/Source/KenneyCubePets` and mirrored for legal review at `docs/legal/assets/kenney-cube-pets-2.0`. `License.txt` identifies **Kenney — www.kenney.nl** and Creative Commons Zero (CC0). The integration manifest records the 24 source filenames and `https://www.kenney.nl`; attribution is retained in project documentation even though CC0 does not require it.
+
+## Visual review and limitations
+
+No new model, texture or character asset was created. A 24-prefab Game-view grid at 16:9/20:9 was not generated in this audit: the project has no pet-grid capture path, and the available headless `-nographics` environment cannot provide a reliable Game-view render. Existing character render failures were not changed or retried. Manual visual review should be performed in the Unity Game view on a graphics-capable editor before the rooms/furniture pass; it must not modify character assets.
+
+## Handoff
+
+The Kenney pet subsystem is ready for the next subsystem, **rooms/furniture**. That work may connect the already-selected pet to room spawn/placement and photo framing, but must not silently expand into new pet art, accessories, animation sets or network services.

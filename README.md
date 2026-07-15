@@ -43,6 +43,22 @@ Os testes Unity ficam em `Assets/Tests/Editor`. O teste automatizado usado nesta
   -projectPath . -runTests -testPlatform editmode -testResults work\unity-tests.xml
 ```
 
+### Pets Kenney (offline)
+
+O subsistema de pets inclui os 24 prefabs locais do Kenney Cube Pets 2.0. `pet.cat` e `pet.dog` continuam sendo os IDs legados; todos os animais usam o catálogo 3D, localização bilíngue, persistência local e os fluxos de casa/foto sem exigir internet. A fonte e a licença Creative Commons Zero ficam arquivadas em `Assets/Art3D/Pets/Source/KenneyCubePets` e `docs/legal/assets/kenney-cube-pets-2.0` (crédito recomendado: **Kenney — www.kenney.nl**).
+
+Para repetir a auditoria focada, execute no diretório do projeto:
+
+```powershell
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneySourceManifestTests -testResults work/kenney-source.xml
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneyPetPrefabTests -testResults work/kenney-prefab.xml
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform editmode -testFilter AlbaWorld.Tests.KenneyPetCatalogTests -testResults work/kenney-catalog.xml
+& 'D:\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe' -batchmode -nographics -projectPath . -runTests -testPlatform playmode -testResults work/kenney-playmode.xml
+& 'C:\Program Files\dotnet\dotnet.exe' test Tools\CoreTests\AlbaWorld.CoreTests.csproj --no-restore
+```
+
+Os resultados, a tabela de triângulos e as limitações da captura visual estão em [`docs/testing/kenney-pets-test-report.md`](docs/testing/kenney-pets-test-report.md). A próxima etapa do projeto é rooms/furniture, limitada a conectar o pet existente ao posicionamento e ao modo foto.
+
 ## AAB
 
 No Unity, use `Alba World > Build Android AAB`. O arquivo é criado em `Builds/AlbaWorld.aab`. A validação local gera um AAB assinado com o certificado Android Debug; configure sua própria keystore/Play App Signing antes do envio à Play Store.
