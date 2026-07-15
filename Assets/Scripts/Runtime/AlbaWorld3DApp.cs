@@ -43,6 +43,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
     private Transform _worldRoot = null!;
     private Transform _petMount = null!;
     private AlbaWorldUiController _ui = null!;
+    private CharacterMovementController _movement = null!;
     private GameObject _hud = null!;
     private bool _started;
 
@@ -127,7 +128,10 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         _character.name = "Character 3D";
         _character.transform.localPosition = new Vector3(-0.45f, 0.19f, 0.5f);
         NormalizeHeight(_character, 2.25f);
-        _character.AddComponent<StudioIdleMotion>().Amplitude = 0.012f;
+        _movement = _character.GetComponent<CharacterMovementController>() ?? _character.AddComponent<CharacterMovementController>();
+        _movement.Initialize(_character.transform, _save, _saveService, RoomFurnitureController.DefaultWalkableBounds, 0.22f);
+        if (_ui != null)
+            _movement.SetInputEnabled(_ui.Mode == AlbaWorldUiMode.Casa);
     }
 
     private void CreatePet()
@@ -198,6 +202,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         var canvasObject = new GameObject("Alba World HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         _hud = canvasObject;
         _ui = canvasObject.AddComponent<AlbaWorldUiController>();
+        _ui.ModeChanged += OnUiModeChanged;
         _ui.Initialize(
             _language,
             _furniture,
@@ -214,6 +219,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
             SelectPet,
             () => { });
         _ui.SetPetName(_language.Get("item." + _save.pet.petId));
+        _movement?.SetInputEnabled(_ui.Mode == AlbaWorldUiMode.Casa);
     }
 
     private void AddFurniture(string itemId)
@@ -283,6 +289,7 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         _save.character.bodyId = _save.character.bodyId == "body.boy" ? "body.girl" : "body.boy";
         if (_character != null)
             Destroy(_character);
+        _movement = null!;
         CreateCharacter();
         SetupPetFollow(_petAssembly?.ActiveInstance);
         Persist();
@@ -321,11 +328,14 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
         _ui?.ShowNotice(message, success);
     }
 
+    private void OnUiModeChanged(AlbaWorldUiMode mode) => _movement?.SetInputEnabled(mode == AlbaWorldUiMode.Casa);
+
     private void Persist()
     {
         if (_save == null || _saveService == null)
             return;
 
+        _movement?.SavePosition();
         _save.languageCode = _language.Code;
         _save.selectedPetId = _save.pet.petId;
         _save.schemaVersion = SaveMigration.CurrentSchemaVersion;

@@ -48,6 +48,7 @@ public sealed class AlbaWorldUiController : MonoBehaviour
     private TMP_Text _petName = null!;
     private TMP_Text _notice = null!;
     private readonly List<Button> _selectionButtons = new();
+    private static TMP_FontAsset? _fallbackFont;
     private string _currentPetName = string.Empty;
     private string _pendingNotice = string.Empty;
     private bool _pendingNoticeSuccess;
@@ -331,7 +332,22 @@ public sealed class AlbaWorldUiController : MonoBehaviour
         go.transform.SetParent(parent, false);
         var text = go.GetComponent<TextMeshProUGUI>();
         text.text = value;
-        text.font = TMP_Settings.defaultFontAsset;
+        try
+        {
+            text.font = TMP_Settings.defaultFontAsset;
+        }
+        catch (NullReferenceException)
+        {
+            // TMP_Settings is not instantiated in a blank runtime scene.
+            text.font = null;
+        }
+        if (text.font == null)
+        {
+            var builtinFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+            if (builtinFont != null)
+                _fallbackFont ??= TMP_FontAsset.CreateFontAsset(builtinFont);
+            text.font = _fallbackFont;
+        }
         text.fontSize = size;
         text.color = color;
         text.alignment = alignment;
