@@ -19,7 +19,7 @@ public sealed class World3DSaveTests
 
         var upgraded = SaveMigration.Upgrade(legacy);
 
-        Assert.Equal(3, upgraded.schemaVersion);
+        Assert.Equal(4, upgraded.schemaVersion);
         Assert.Equal("body.girl", upgraded.character.bodyId);
         Assert.Equal("skin.honey", upgraded.character.skinId);
         Assert.Equal("hair.cloud", upgraded.character.hairId);
