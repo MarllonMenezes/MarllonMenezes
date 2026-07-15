@@ -11,6 +11,13 @@ public sealed class PetFollowController : MonoBehaviour
     [SerializeField, Min(0f)] private float followSpeed = 4f;
     [SerializeField, Min(0f)] private float turnSpeed = 12f;
     [SerializeField] private float floorHeight;
+    [SerializeField] private bool followEnabled = true;
+
+    public bool FollowEnabled
+    {
+        get => followEnabled;
+        set => followEnabled = value;
+    }
 
     public Transform? FollowTarget
     {
@@ -44,7 +51,7 @@ public sealed class PetFollowController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (followTarget == null)
+        if (!followEnabled || followTarget == null)
             return;
 
         var current = transform.position;

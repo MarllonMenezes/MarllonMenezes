@@ -440,6 +440,8 @@ public sealed class RoomFurnitureController : MonoBehaviour
             SetSelected(id);
             return;
         }
+        if (WorldSelectionContext.WasSelectedThisFrame)
+            return;
 
         if (!TryGetFloorPoint(ray, out var floorPoint))
             return;

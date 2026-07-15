@@ -124,6 +124,8 @@ public sealed class PetPersistenceCoordinator
     {
         petId = source.petId,
         colorId = source.colorId,
-        accessoryIds = source.accessoryIds == null ? Array.Empty<string>() : (string[])source.accessoryIds.Clone()
+        accessoryIds = source.accessoryIds == null ? Array.Empty<string>() : (string[])source.accessoryIds.Clone(),
+        followCharacter = source.followCharacter,
+        position = source.position == null ? new SerializableVector3(1.45f, 0.2f, 0.2f) : new SerializableVector3(source.position.x, source.position.y, source.position.z)
     };
 }

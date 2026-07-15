@@ -116,6 +116,7 @@ public static class SaveMigration
         save.pet.petId = DefaultIfBlank(save.pet.petId, "pet.cat");
         save.pet.colorId = DefaultIfBlank(save.pet.colorId, "petcolor.sunny");
         save.pet.accessoryIds = NormalizeIds(save.pet.accessoryIds);
+        save.pet.position ??= new SerializableVector3(1.45f, 0.2f, 0.2f);
     }
 
     private static string DefaultIfBlank(string value, string fallback) =>

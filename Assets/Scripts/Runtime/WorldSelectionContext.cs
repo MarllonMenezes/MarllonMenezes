@@ -46,6 +46,8 @@ public sealed class WorldSelectable : MonoBehaviour
 public static class WorldSelectionContext
 {
     public static WorldSelectable? Current { get; private set; }
+    public static bool WasSelectedThisFrame => _selectionFrame == Time.frameCount;
+    private static int _selectionFrame = -1;
 
     public static bool Select(WorldSelectable selectable)
     {
@@ -57,6 +59,7 @@ public static class WorldSelectionContext
         Current?.SetSelected(false);
         Current = selectable;
         Current.SetSelected(true);
+        _selectionFrame = Time.frameCount;
         return true;
     }
 
@@ -84,5 +87,6 @@ public static class WorldSelectionContext
     {
         Current?.SetSelected(false);
         Current = null;
+        _selectionFrame = -1;
     }
 }

@@ -34,6 +34,8 @@ public sealed class PetLoadoutData
     public string petId = "pet.cat";
     public string colorId = "petcolor.sunny";
     public string[] accessoryIds = Array.Empty<string>();
+    public bool followCharacter = true;
+    public SerializableVector3 position = new(1.45f, 0.2f, 0.2f);
 }
 
 [Serializable]

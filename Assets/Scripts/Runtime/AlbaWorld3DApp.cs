@@ -210,6 +210,17 @@ public sealed class AlbaWorld3DApp : MonoBehaviour
                 collider.size = bounds.size;
             }
         }
+        var placement = instance.GetComponent<PetPlacementController>();
+        if (placement == null)
+            placement = instance.AddComponent<PetPlacementController>();
+        placement.Initialize(
+            instance.transform,
+            _save,
+            _saveService,
+            new Bounds(new Vector3(0f, 0.2f, 0.45f), new Vector3(8.2f, 0.1f, 5.2f)),
+            0.2f,
+            follow,
+            _worldRoot);
         instance.AddComponent<StudioIdleMotion>().Amplitude = 0.025f;
     }
 
